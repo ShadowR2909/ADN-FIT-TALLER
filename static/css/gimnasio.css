@@ -1,0 +1,165 @@
+/* static/css/gimnasio.css - Nuevo Diseño */
+
+body {
+    background-color: #000000; /* Fondo negro como el logo */
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* Usa min-height para que el contenido crezca si es necesario */
+    margin: 0;
+    color: #f0f0f0; /* Color de texto general claro */
+}
+
+/* --- DISEÑO DE LOGO --- */
+.auth-card .logo {
+    margin-bottom: 25px; /* Espacio debajo del logo */
+}
+
+.auth-card .logo img {
+    max-width: 180px; /* Un poco más grande para el logo */
+    height: auto;
+    box-shadow: 0 5px 15px rgba(48, 227, 51, 0.4); /* Sombra con el color del logo */
+}
+
+/* --- TARJETA DE AUTENTICACIÓN --- */
+.auth-card {
+    background-color: #1a1a1a; /* Un gris muy oscuro para la tarjeta */
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5); /* Sombra más pronunciada */
+    width: 100%;
+    max-width: 450px;
+    text-align: center;
+    border: 1px solid #30e333; /* Borde sutil del color del logo */
+}
+
+.auth-card h2 {
+    color: #30e333; /* Título en el color del logo */
+    margin-bottom: 30px;
+    font-size: 2.2em;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* --- ESTILO DE CAMPOS DE FORMULARIO --- */
+.form-field {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-field label {
+    display: block;
+    margin-bottom: 8px;
+    color: #cccccc;
+    font-weight: normal;
+    font-size: 1.1em;
+}
+
+.form-field input[type="text"],
+.form-field input[type="password"],
+.form-field input[type="email"] {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #555555;
+    border-radius: 6px;
+    box-sizing: border-box;
+    background-color: #2a2a2a;
+    color: #ffffff;
+    font-size: 1em;
+}
+
+.form-field input[type="text"]:focus,
+.form-field input[type="password"]:focus,
+.form-field input[type="email"]:focus {
+    border-color: #30e333;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(48, 227, 51, 0.3);
+}
+
+/* --- ESTILO DEL BOTÓN --- */
+.form-submit-btn {
+    width: 100%;
+    padding: 15px;
+    background-color: #30e333; /* Verde vibrante del logo */
+    color: #000000;
+    border: none;
+    border-radius: 6px;
+    font-size: 1.2em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-top: 20px;
+}
+
+.form-submit-btn:hover {
+    background-color: #25bb25; /* Un verde ligeramente más oscuro al pasar el cursor */
+    transform: translateY(-2px);
+}
+
+/* Estilo para los requisitos de contraseña */
+.password-requirements {
+    list-style-type: none; /* Elimina los puntos predeterminados */
+    padding: 0;
+    margin-top: 10px;
+    font-size: 0.9em;
+    color: #f0f0f0; /* Color gris claro para el texto de los requisitos */
+    text-align: left;
+}
+
+.password-requirements li {
+    margin-bottom: 5px;
+    padding-left: 20px;
+    position: relative;
+}
+
+.password-requirements li::before {
+    content: '✖'; /* El símbolo de la X */
+    font-weight: bold;
+    color: #e74c3c; /* Color rojo para la X */
+    position: absolute;
+    left: 0;
+}
+
+/* --- ESTILO DE ENLACES --- */
+.links {
+    margin-top: 30px;
+    font-size: 1.05em;
+}
+
+.links a {
+    color: #30e333; /* Enlaces en color verde del logo */
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.links a:hover {
+    color: #ffffff;
+}
+
+/* Estilos para mensajes de Django */
+ul.messages {
+    list-style: none;
+    padding: 0;
+    margin-top: 15px;
+}
+
+ul.messages li {
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+ul.messages li.success {
+    background-color: rgba(48, 227, 51, 0.1);
+    color: #30e333;
+    border: 1px solid #30e333;
+}
+
+ul.messages li.error {
+    background-color: rgba(255, 99, 71, 0.1);
+    color: #ff6347;
+    border: 1px solid #ff6347;
+}

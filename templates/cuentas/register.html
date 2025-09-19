@@ -1,0 +1,50 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrarse - ADN Fitness</title>
+    <link rel="stylesheet" href="{% static 'css/gimnasio.css' %}">
+</head>
+<body>
+    <div class="auth-card">
+        <div class="logo">
+            <img src="{% static 'img/logo-gym.png' %}" alt="ADN Fitness Logo">
+        </div>
+        <h2>REGISTRARSE</h2>
+
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-field">
+                    {% if field.name == 'username' %}
+                        <label for="{{ field.id_for_label }}">Nombre de Usuario:</label>
+                    {% elif field.name == 'email' %}
+                        <label for="{{ field.id_for_label }}">Correo Electrónico:</label>
+                    {% elif field.name == 'password' %}
+                        <label for="{{ field.id_for_label }}">Contraseña:</label>
+                    {% elif field.name == 'password2' %}
+                        <label for="{{ field.id_for_label }}">Confirmar Contraseña:</label>
+                    {% elif field.name == 'grupo' %}
+                        <label for="{{ field.id_for_label }}">Grupo:</label>
+                    {% else %}
+                        {{ field.label_tag }}
+                    {% endif %}
+
+                    {{ field }}
+                    
+                    {% for error in field.errors %}
+                        <p class="message-error">{{ error|striptags }}</p>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+
+            <button type="submit" class="form-submit-btn">CREAR CUENTA</button>
+        </form>
+        <div class="links">
+            <a href="{% url 'login' %}">¿YA TIENES UNA CUENTA? INICIA SESIÓN</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,34 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - ADN Fitness</title>
+    <link rel="stylesheet" href="{% static 'css/gimnasio.css' %}">
+</head>
+<body>
+    <div class="auth-card">
+        <div class="logo">
+            <img src="{% static 'img/logo-gym.png' %}" alt="ADN Fitness Logo">
+        </div>
+        <h2>INICIAR SESIÓN</h2>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-field">
+                <label for="id_username">Correo Electrónico:</label>
+                <input type="text" id="id_username" name="username" placeholder="ejemplo@email.com" required>
+            </div>
+            <div class="form-field">
+                <label for="id_password">Contraseña:</label>
+                <input type="password" id="id_password" name="password" placeholder="Ingresa tu contraseña" required>
+            </div>
+            <button type="submit" class="form-submit-btn">INGRESAR</button>
+        </form>
+        <div class="links">
+            <a href="{% url 'register' %}">¿NO TIENES UNA CUENTA? REGÍSTRATE AQUÍ</a>
+        </div>
+    </div>
+</body>
+</html>

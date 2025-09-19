@@ -1,0 +1,24 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboardt</title>
+    <link rel="stylesheet" href="{% static 'css/gimnasio.css' %}">
+</head>
+<body>
+      <div class="container">
+            <h1>¡Bienvenido a tu panel de control!</h1>
+            <p>Tu contenido irá aquí.</p>
+      </div>
+      <br>
+      <br>
+      <h2>Dashboard</h2>
+      <p>Hola, {{ request.user.username }}.</p>
+      <p>Tus perfiles/roles: 
+        {% for g in request.user.groups.all %} {{ g.name }} {% empty %} (sin perfil) {% endfor %}
+      </p>
+      <p><a href="{% url 'logout' %}">Salir</a></p>
+</body>
+</html>
