@@ -83,8 +83,12 @@ WSGI_APPLICATION = 'gimnasio.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',  # Nombre de la base, en Supabase suele ser 'postgres'
+        'USER': 'postgres.dfplifenjfhgdamtfukb',  # Usuario de la DB (en Supabase suele empezar con 'postgres')
+        'PASSWORD': 'root',  # La contraseña que te da Supabase
+        'HOST': 'aws-1-us-east-2.pooler.supabase.com',  # Host de Supabase (copialo del panel)
+        'PORT': '6543',  # Puerto de PostgreSQL
     }
 }
 

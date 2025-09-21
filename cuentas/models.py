@@ -9,7 +9,7 @@ class Profile(models.Model):
     # otros campos...
     rol = models.CharField(
         max_length=20,
-        choices=[('admin','Administrador'),('Entrenador','Entrenador'),('Socio','Socio')]
+        choices=[('admin','Administrador'),('Entrenador','entrenador'),('Socio','socio')]
     )
 
     def __str__(self):
