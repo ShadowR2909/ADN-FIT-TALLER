@@ -1,0 +1,12 @@
+{% extends "cuentas/base.html" %}
+
+{% block content %}
+<h2>Mis Clases</h2>
+<p>Bienvenido {{ user.username }} ({{ user.profile.rol }})</p>
+
+<ul>
+    <li>Clase de Yoga - Lunes 18:00</li>
+    <li>Spinning - Miércoles 19:00</li>
+    <li>Pilates - Viernes 17:00</li>
+</ul>
+{% endblock %}

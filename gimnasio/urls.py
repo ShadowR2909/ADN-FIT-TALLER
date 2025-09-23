@@ -20,6 +20,7 @@ from cuentas import views as cuentas_views
 
 urlpatterns = [
 
+    
     path('accounts/',include ('django.contrib.auth.urls')),
     path('register/',cuentas_views.register,name='register'),
     path('',cuentas_views.dashboard, name='dashboard'),

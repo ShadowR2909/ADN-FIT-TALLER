@@ -16,30 +16,19 @@
 
         <form method="post">
             {% csrf_token %}
-            {% for field in form %}
-                <div class="form-field">
-                    {% if field.name == 'username' %}
-                        <label for="{{ field.id_for_label }}">Nombre de Usuario:</label>
-                    {% elif field.name == 'email' %}
-                        <label for="{{ field.id_for_label }}">Correo Electrónico:</label>
-                    {% elif field.name == 'password' %}
-                        <label for="{{ field.id_for_label }}">Contraseña:</label>
-                    {% elif field.name == 'password2' %}
-                        <label for="{{ field.id_for_label }}">Confirmar Contraseña:</label>
-                    {% elif field.name == 'grupo' %}
-                        <label for="{{ field.id_for_label }}">Grupo:</label>
-                    {% else %}
+                {% for field in form %}
+                    <div class="form-field">
+                        {% if field.name == 'rol' %}
+                        <label for="{{ field.id_for_label }}">Rol:</label>
+                        {% else %}
                         {{ field.label_tag }}
-                    {% endif %}
-
-                    {{ field }}
-                    
-                    {% for error in field.errors %}
+                        {% endif %}
+                        {{ field }}
+                        {% for error in field.errors %}
                         <p class="message-error">{{ error|striptags }}</p>
+                        {% endfor %}
+                    </div>
                     {% endfor %}
-                </div>
-            {% endfor %}
-
             <button type="submit" class="form-submit-btn">CREAR CUENTA</button>
         </form>
         <div class="links">

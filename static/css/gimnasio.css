@@ -17,7 +17,7 @@ body {
 }
 
 .auth-card .logo img {
-    max-width: 180px; /* Un poco más grande para el logo */
+    max-width: 70px; /* Un poco más grande para el logo */
     height: auto;
     box-shadow: 0 5px 15px rgba(48, 227, 51, 0.4); /* Sombra con el color del logo */
 }
@@ -162,4 +162,89 @@ ul.messages li.error {
     background-color: rgba(255, 99, 71, 0.1);
     color: #ff6347;
     border: 1px solid #ff6347;
+}
+
+/* --- DISEÑO DEL DASHBOARD --- */
+
+.dashboard-container {
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 20px;
+    background-color: #1a1a1a;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
+    color: #f0f0f0;
+    font-family: Arial, sans-serif;
+}
+
+.dashboard-container header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #30e333;
+    padding-bottom: 15px;
+}
+
+.dashboard-container .logo img {
+    max-width: 120px;
+    height: auto;
+    border-radius: 8px;
+}
+
+.dashboard-container .user-info {
+    text-align: right;
+}
+
+.dashboard-container .user-info p {
+    margin: 0;
+    font-weight: 500;
+}
+
+.dashboard-container .user-info a {
+    color: #30e333;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.dashboard-container .user-info a:hover {
+    text-decoration: underline;
+}
+
+.dashboard-container nav {
+    margin: 25px 0;
+}
+
+.dashboard-container nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: 25px;
+}
+
+.dashboard-container nav ul li {
+    display: inline;
+}
+
+.dashboard-container nav ul li a {
+    color: #30e333;
+    text-decoration: none;
+    font-weight: 600;
+    padding: 8px 15px;
+    border-radius: 6px;
+    transition: background-color 0.3s ease;
+}
+
+.dashboard-container nav ul li a:hover {
+    background-color: rgba(48, 227, 51, 0.2);
+}
+
+.dashboard-container main h2 {
+    font-size: 1.8em;
+    color: #30e333;
+    margin-bottom: 15px;
+}
+
+.dashboard-container main p {
+    font-size: 1.1em;
+    line-height: 1.5;
 }

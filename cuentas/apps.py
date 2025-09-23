@@ -5,4 +5,4 @@ class CuentasConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'cuentas'
     def ready(self):
-        import cuentas.signals  #noqa
+        import cuentas.signals  # Aquí se importan para que django los registre

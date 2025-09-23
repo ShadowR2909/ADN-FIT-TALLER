@@ -1,14 +1,13 @@
 from django.contrib import messages
-from django.contrib.auth import login
-from django.contrib.auth.decorators import login_required, user_passes_test
-from django.contrib.auth.models import Group
-from django.shortcuts import render, redirect
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
-from .forms import ProfileForm
-from .forms import RegistroUsuarioForm
+from django.shortcuts import render, redirect
+from .forms import ProfileForm, RegistroUsuarioForm
+from .models import Profile
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.forms import authenticate
 
-
-# Create your views here.
+# Registro de usuario
 def register(request):
     if request.method == 'POST':
         form = RegistroUsuarioForm(request.POST)
@@ -17,23 +16,54 @@ def register(request):
             user.email = form.cleaned_data['email']
             user.save()
 
-            #Asignar el grupo 
+            rol = form.cleaned_data['rol']  # o grupo si lo tenés así
 
-            grupo = form.cleaned_data['grupo']
-            user.groups.add(grupo)
-            messages.success(request, 'Usuario creado y perfil asignado')
+            # Crear perfil si no existe
+            perfil, created = Profile.objects.get_or_create(user=user)
+            perfil.rol = rol
+            perfil.save()
 
-            #opcional: loguear automaticamente al usuario
             login(request, user)
+            messages.success(request, 'Usuario creado y perfil asignado')
             return redirect('dashboard')
     else:
         form = RegistroUsuarioForm()
     return render(request,'cuentas/register.html', {'form': form})
-    
+
+
+# Login de usuario
+
+def login_view(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+
+            # Redirigir según rol
+            perfil = user.profile
+            rol = perfil.rol.lower()
+            if rol == "socio":
+                return redirect("mis_clases")
+            elif rol == "entrenador":
+                return redirect("lista_alumnos")
+            elif rol in ["admin", "administrador"]:
+                return redirect("gestion_usuarios")
+        else:
+            messages.error(request, "Usuario o contraseña incorrectos.")
+
+    return render(request, "registration/login.html")
+
+# Dashboard dinámico
 @login_required
 def dashboard(request):
-    return render(request, 'cuentas/dashboard.html')
+    perfil = request.user.profile  # cada usuario tiene su perfil
+    return render(request, 'cuentas/dashboard.html', {"perfil": perfil})
 
+
+# Editar perfil
 @login_required
 def editar_perfil(request):
     perfil = request.user.profile
@@ -46,3 +76,16 @@ def editar_perfil(request):
     else:
         form = ProfileForm(instance=perfil)
     return render(request, 'cuentas/editar_perfil.html', {'form': form})
+
+# vistas de ejemplo para cada rol
+@login_required
+def mis_clases(request):
+    return render(request, "cuentas/mis_clases.html")
+
+@login_required
+def lista_alumnos(request):
+    return render(request, "cuentas/lista_alumnos.html")
+
+@login_required
+def gestion_usuarios(request):
+    return render(request, "cuentas/gestion_usuarios.html")

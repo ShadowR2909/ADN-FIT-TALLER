@@ -1,24 +1,51 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboardt</title>
+    <title>Dashboard - ADN Fitness</title>
     <link rel="stylesheet" href="{% static 'css/gimnasio.css' %}">
 </head>
 <body>
-      <div class="container">
-            <h1>¡Bienvenido a tu panel de control!</h1>
-            <p>Tu contenido irá aquí.</p>
-      </div>
-      <br>
-      <br>
-      <h2>Dashboard</h2>
-      <p>Hola, {{ request.user.username }}.</p>
-      <p>Tus perfiles/roles: 
-        {% for g in request.user.groups.all %} {{ g.name }} {% empty %} (sin perfil) {% endfor %}
-      </p>
-      <p><a href="{% url 'logout' %}">Salir</a></p>
+    <div class="dashboard-container">
+        <header>
+            <div class="logo">
+                <img src="{% static 'img/logo-gym.png' %}" alt="ADN Fitness">
+            </div>
+            <div class="user-info">
+                <p>Bienvenido, {{ request.user.username }}</p>
+                <p>Rol: {{ perfil.rol }}</p>
+                <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" style="background:none;border:none;color:#30e333;cursor:pointer;font-weight:bold;">
+                        Cerrar Sesión
+                    </button>
+                </form>
+            </div>
+        </header>
+
+        <nav>
+            <ul>
+                {% if perfil.rol == "Socio" %}
+                    <li><a href="{% url 'mis_clases' %}">Mis Clases</a></li>
+                    <li><a href="#">Mis Pagos</a></li>
+
+                {% elif perfil.rol == "Entrenador" %}
+                    <li><a href="{% url 'lista_alumnos' %}">Lista de Socios</a></li>
+                    <li><a href="#">Asignar Rutinas</a></li>
+
+                {% elif perfil.rol == "admin" or perfil.rol == "Administrador" %}
+                    <li><a href="{% url 'gestion_usuarios' %}">Gestión de Usuarios</a></li>
+                    <li><a href="#">Reportes</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+
+        <main>
+            <h2>Panel Principal</h2>
+            <p>Contenido según rol del usuario.</p>
+        </main>
+    </div>
 </body>
 </html>
