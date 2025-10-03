@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Mi Membresía</h2>
+
+{% if membresia %}
+    <p>Plan: {{ membresia.plan.nombre }}</p>
+    <p>Fecha de inicio: {{ membresia.fecha_inicio }}</p>
+    <p>Fecha de vencimiento: {{ membresia.fecha_vencimiento }}</p>
+    <p>Estado: {% if membresia.activo %}Activa{% else %}Inactiva{% endif %}</p>
+{% else %}
+    <p>Aún no tienes una membresía activa.</p>
+{% endif %}
+
+<a href="{% url 'dashboard' %}">Volver al Dashboard</a>
+{% endblock %}

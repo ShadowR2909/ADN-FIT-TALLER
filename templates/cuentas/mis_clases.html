@@ -1,12 +1,73 @@
-{% extends "cuentas/base.html" %}
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mis Clases Grupales{% endblock %}
 
 {% block content %}
-<h2>Mis Clases</h2>
-<p>Bienvenido {{ user.username }} ({{ user.profile.rol }})</p>
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="text-white">Horario de Clases Grupales</h1>
+            <p class="lead text-white-50">Consulta e inscríbete en tus clases favoritas.</p>
+        </div>
+    </div>
+    
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    {% endif %}
 
-<ul>
-    <li>Clase de Yoga - Lunes 18:00</li>
-    <li>Spinning - Miércoles 19:00</li>
-    <li>Pilates - Viernes 17:00</li>
-</ul>
-{% endblock %}
+    <div class="card p-4 bg-dark text-white shadow">
+        <div class="table-responsive">
+            <table class="table table-dark table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">Clase</th>
+                        <th scope="col">Día</th>
+                        <th scope="col">Horario</th>
+                        <th scope="col">Entrenador</th>
+                        <th scope="col">Cupo</th>
+                        <th scope="col">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for clase in clases_disponibles %}
+                    <tr>
+                        <td>{{ clase.nombre }}</td>
+                        <td>{{ clase.get_dia_semana_display }}</td>
+                        <td>{{ clase.hora_inicio|time:"H:i" }} - {{ clase.hora_fin|time:"H:i" }}</td>
+                        <td>{{ clase.entrenador.username }}</td>
+                        <td>{{ clase.inscritos.count }}/{{ clase.cupo_maximo }}</td>
+                        <td>
+                            {% if clase.id in clases_inscritas %}
+                                <button class="btn btn-sm btn-success disabled">Inscrito</button>
+                            {% else %}
+                                {% if clase.inscritos.count >= clase.cupo_maximo %}
+                                    <button class="btn btn-sm btn-danger disabled">Cupo Lleno</button>
+                                {% else %}
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="clase_id" value="{{ clase.id }}">
+                                        <button type="submit" class="btn btn-sm btn-info">Inscribirse</button>
+                                    </form>
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center">No hay clases programadas en este momento.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary mt-4">← Volver al Dashboard</a>
+</div>
+{% endblock content %}

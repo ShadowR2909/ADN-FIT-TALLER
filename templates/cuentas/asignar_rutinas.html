@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Asignar Rutinas{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="text-white">Asignación de Rutinas💪🏻</h1>
+            <p class="lead text-white-50">Crea y asigna planes de entrenamiento personalizados a tus alumnos.</p>
+        </div>
+    </div>
+    
+    {% comment %} Mensajes de Django {% endcomment %}
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="row">
+        <div class="col-lg-5 mb-4">
+            <div class="card p-4 bg-dark text-white shadow">
+                <h3>Crear y Asignar Nueva Rutina</h3>
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% for field in form %}
+                    <div class="mb-3">
+                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {% for error in field.errors %}
+                            <small class="text-danger d-block">{{ error }}</small>
+                        {% endfor %}
+                        {% if field.help_text %}
+                            <small class="form-text text-white-50">{{ field.help_text }}</small>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+
+                    <button type="submit" class="btn btn-success w-100 mt-2">Asignar Rutina</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-lg-7 mb-4">
+            <div class="card p-4 bg-dark text-white shadow">
+                <h3>Historial de Asignaciones</h3>
+                <div class="table-responsive">
+                    <table class="table table-dark table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col">Socio</th>
+                                <th scope="col">Rutina</th>
+                                <th scope="col">Fecha Asignación</th>
+                                <th scope="col">Estado</th>
+                                <th scope="col">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for rutina in rutinas_asignadas %}
+                            <tr>
+                                <td>{{ rutina.socio.username }}</td>
+                                <td>{{ rutina.nombre }}</td>
+                                <td>{{ rutina.fecha_asignacion|date:"d M Y" }}</td>
+                                <td>
+                                    {% if rutina.activa %}
+                                        <span class="badge bg-success">ACTIVA</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Inactiva</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="#" class="btn btn-sm btn-info disabled">Ver/Editar</a>
+                                    </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center">Aún no has asignado ninguna rutina.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary mt-3">← Volver al Dashboard</a>
+</div>
+{% endblock content %}

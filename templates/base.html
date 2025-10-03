@@ -1,0 +1,97 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Gimnasio ADN-FIT{% endblock %}</title>
+    
+    <link href="{% static 'vendor/css/bootstrap.min.css' %}" rel="stylesheet">
+    
+    <link rel="stylesheet" href="{% static 'css/gimnasio.css' %}">
+    
+    {% block extra_head %}{% endblock %}
+</head>
+<body {% if auth_page %}class="auth-page"{% endif %}>
+    
+    {% if user.is_authenticated and not auth_page %}
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top"> 
+            <div class="container-fluid">
+                
+                <a class="navbar-brand text-success fw-bold" href="{% url 'dashboard' %}">
+                    <img src="{% static 'img/logo-gym.png' %}" alt="Logo Gimnasio" width="30" height="30" class="d-inline-block align-text-top me-2">
+                    ADN-FIT
+                </a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#gymMainNavbar" aria-controls="gymMainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="gymMainNavbar">
+                    
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
+                        </li>
+                        
+                        {% with user.profile.rol as rol %}
+                        
+                        {% if rol == "Socio" %}
+                            <li class="nav-item"><a class="nav-link" href="{% url 'mis_clases' %}">Clases</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'mi_membresia' %}">Mi Membresía</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'mi_rutina' %}">Mi Rutina</a></li>
+                        {% endif %}
+                        
+                        {% if rol == "Entrenador" or rol == "Administrador" %}
+                            <li class="nav-item"><a class="nav-link" href="{% url 'asignar_rutinas' %}">Asignar Rutinas</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'gestion_clases' %}">Gestión Clases</a></li>
+                        {% endif %}
+                        
+                        {% if rol == "Administrador" %}
+                            <li class="nav-item"><a class="nav-link" href="{% url 'gestion_usuarios' %}">Usuarios</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'gestion_planes' %}">Planes</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'gestion_membresias' %}">Membresías</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'reportes' %}">Reportes</a></li>
+                        {% endif %}
+                        
+                        {% endwith %}
+                    </ul>
+
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                        <li class="nav-item me-2">
+                            <a class="btn btn-outline-info" href="{% url 'editar_perfil' %}">Mi Perfil ({{ user.username }})</a>
+                        </li>
+                        <li class="nav-item"> 
+                            <form method="post" action="{% url 'logout' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">Cerrar Sesión</button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    {% endif %}
+    
+    <div class="main-content-wrapper">
+        
+        {% if messages and not auth_page %}
+            <div class="container mt-4">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="{% block content_wrapper_class %}gestion-container{% endblock %}">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
+
+    <script src="{% static 'vendor/js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>

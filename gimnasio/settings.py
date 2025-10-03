@@ -39,9 +39,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # Local apps
-    'cuentas.apps.CuentasConfig',
+    'cuentas.apps.CuentasConfig',   #App de usuario y Perfiles
+    'gestion',                      #App de Planes, Membresias, Rutinas, etc
 ]
 
+LOGIN_URL = 'login' 
 LOGIN_REDIRECT_URL = 'dashboard'   # a dónde enviar luego de login
 LOGOUT_REDIRECT_URL = 'login'      # a dónde enviar luego de logout
 
@@ -70,6 +72,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                
+                'cuentas.context_processors.perfil_context',  # Agregado para pasar el perfil a todas las plantillas
             ],
         },
     },

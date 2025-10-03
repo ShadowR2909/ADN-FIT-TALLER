@@ -8,29 +8,53 @@
     <link rel="stylesheet" href="{% static 'css/gimnasio.css' %}">
 </head>
 <body>
+    
+    {% if messages %}
+        <div class="messages-container">
+            {% for message in messages %}
+                <p class="message-{{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
     <div class="auth-card">
         <div class="logo">
             <img src="{% static 'img/logo-gym.png' %}" alt="ADN Fitness Logo">
         </div>
-        <h2>REGISTRARSE</h2>
+        <h2>CREAR CUENTA</h2>
 
         <form method="post">
             {% csrf_token %}
-                {% for field in form %}
+            
+            {% for field in form %}
+                {% if field.name == 'rol' %}
+                    {{ field }}
+                {% else %}
                     <div class="form-field">
-                        {% if field.name == 'rol' %}
-                        <label for="{{ field.id_for_label }}">Rol:</label>
-                        {% else %}
                         {{ field.label_tag }}
-                        {% endif %}
                         {{ field }}
                         {% for error in field.errors %}
-                        <p class="message-error">{{ error|striptags }}</p>
+                            <p class="message-error">{{ error|striptags }}</p>
                         {% endfor %}
+                        
+                        {% if field.help_text %}
+                            <p class="help-text">{{ field.help_text }}</p>
+                        {% endif %}
                     </div>
+                {% endif %}
+            {% endfor %}
+
+            {% if form.non_field_errors %}
+                <div class="form-field">
+                    {% for error in form.non_field_errors %}
+                        <p class="message-error">{{ error|striptags }}</p>
                     {% endfor %}
+                </div>
+            {% endif %}
+
             <button type="submit" class="form-submit-btn">CREAR CUENTA</button>
         </form>
+        
         <div class="links">
             <a href="{% url 'login' %}">¿YA TIENES UNA CUENTA? INICIA SESIÓN</a>
         </div>

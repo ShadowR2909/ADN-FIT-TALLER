@@ -1,19 +1,27 @@
+# cuentas/urls.py
+
 from django.urls import path
-from django.contrib.auth import views as auth_views
-from django.contrib.auth.views import LogoutView
 from . import views
 
 urlpatterns = [
-    path("login/", views.login_view, name="login"),           # login personalizado
-    path("register/", views.register, name="register"),      # registro
-    path("dashboard/", views.dashboard, name="dashboard"),   # dashboard general
-    path("editar-perfil/", views.editar_perfil, name="editar_perfil"),  # editar perfil
-
-    # páginas según rol
+    # 1. Autenticación (El login es la página de inicio para NO logueados)
+    path("", views.login_view, name="login"), # <-- Login ahora en la ruta raíz
+    path("logout/", views.logout_view, name="logout"),
+    path("register/", views.register, name="register"),
+    
+    # 2. Dashboard (Ahora tiene una ruta específica, accesible solo logueado)
+    path("dashboard/", views.dashboard, name="dashboard"), 
+    
+    # Perfil y Socio
+    path("perfil/", views.editar_perfil, name="editar_perfil"),
+    path("mi-plan/", views.mi_plan_view, name="mi_plan"),
     path("mis-clases/", views.mis_clases, name="mis_clases"),
-    path("lista-alumnos/", views.lista_alumnos, name="lista_alumnos"),
-    path("gestion-usuarios/", views.gestion_usuarios, name="gestion_usuarios"),
+    path("mi-rutina/", views.mi_rutina_view, name="mi_rutina"),
+    path('mi-membresia/', views.mi_membresia, name='mi_membresia'),
 
-    # logout usando la vista de Django (acepta GET)
-    path('logout/', LogoutView.as_view(), name='logout'),
+    
+    # Entrenador/Admin
+    path("alumnos/", views.lista_alumnos, name="lista_alumnos"),
+    path("asignar-rutinas/", views.asignar_rutinas_view, name="asignar_rutinas"),
+    path("gestion-usuarios/", views.gestion_usuarios, name="gestion_usuarios"),
 ]

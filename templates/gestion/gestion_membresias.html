@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="text-white">{{ titulo }}</h1>
+            <p class="lead text-white-50">Asigna, edita y gestiona las membresías activas de los socios.</p>
+        </div>
+    </div>
+    
+    {% comment %} Mensajes de Django {% endcomment %}
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="row">
+        <div class="col-lg-7">
+            <div class="card p-4 bg-dark text-white shadow">
+                <h3>Membresías Registradas</h3>
+                <div class="table-responsive">
+                    <table class="table table-dark table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col">Socio</th>
+                                <th scope="col">Plan Asignado</th>
+                                <th scope="col">Inicio</th>
+                                <th scope="col">Vencimiento</th>
+                                <th scope="col">Estado</th>
+                                <th scope="col">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for membresia in membresias %}
+                            <tr>
+                                <td>{{ membresia.socio.username }}</td>
+                                <td>{{ membresia.plan.nombre }}</td>
+                                <td>{{ membresia.fecha_inicio|date:"d M Y" }}</td>
+                                <td>{{ membresia.fecha_vencimiento|date:"d M Y" }}</td>
+                                <td>
+                                    {% comment %} Lógica simple para determinar si está activa o vencida {% endcomment %}
+                                    {% if membresia.fecha_vencimiento|date:"Ymd" > "now"|date:"Ymd" %}
+                                        <span class="badge bg-success">Activa</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Vencida</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'editar_membresia' membresia_id=membresia.id %}" class="btn btn-sm btn-info">Editar</a>
+                                    <form method="POST" action="{% url 'eliminar_registro' model_name='membresia' pk=membresia.id %}" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que quieres eliminar la membresía de {{ membresia.socio.username }}?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center">No hay membresías asignadas.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card p-4 bg-dark text-white shadow">
+                <h3>Asignar Membresía</h3>
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% for field in form %}
+                    <div class="mb-3">
+                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {% for error in field.errors %}
+                            <small class="text-danger d-block">{{ error }}</small>
+                        {% endfor %}
+                        {% if field.help_text %}
+                            <small class="form-text text-white-50">{{ field.help_text }}</small>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+
+                    <button type="submit" class="btn btn-success w-100 mt-2">Asignar Membresía</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary mt-4">← Volver al Dashboard</a>
+</div>
+{% endblock content %}

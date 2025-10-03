@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Gestión de Usuarios{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="text-white">Gestión de Usuarios</h1>
+            <p class="lead text-white-50">Administra todos los usuarios del sistema (Socios, Entrenadores y Administradores).</p>
+        </div>
+    </div>
+
+    <div class="card p-4 bg-dark text-white shadow">
+        <div class="table-responsive">
+            <table class="table table-dark table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Usuario</th>
+                        <th scope="col">Correo Electrónico</th>
+                        <th scope="col">Nombre Completo</th>
+                        <th scope="col">Rol</th>
+                        <th scope="col">Activo</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for usuario in usuarios %}
+                    <tr>
+                        <th scope="row">{{ usuario.id }}</th>
+                        <td>{{ usuario.username }}</td>
+                        <td>{{ usuario.email|default:"No registrado" }}</td>
+                        <td>{{ usuario.first_name }} {{ usuario.last_name }}</td>
+                        <td><span class="badge bg-primary">{{ usuario.profile.rol|capfirst }}</span></td>
+                        <td>
+                            {% if usuario.is_active %}
+                                <span class="badge bg-success">Sí</span>
+                            {% else %}
+                                <span class="badge bg-danger">No</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="#" class="btn btn-sm btn-info" disabled>Editar</a>
+                            <form method="POST" action="#" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que quieres eliminar a {{ usuario.username }}?');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-danger" disabled>Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center">No hay usuarios registrados en el sistema.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary mt-3 align-self-start">← Volver al Dashboard</a>
+    </div>
+
+</div>
+{% endblock content %}

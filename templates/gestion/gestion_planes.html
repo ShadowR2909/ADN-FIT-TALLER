@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="text-white">{{ titulo }}</h1>
+            <p class="lead text-white-50">Crea, edita y gestiona los planes y tarifas de membresía.</p>
+        </div>
+    </div>
+    
+    {% comment %} Mensajes de Django {% endcomment %}
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card p-4 bg-dark text-white shadow">
+                <h3>Planes Existentes</h3>
+                <div class="table-responsive">
+                    <table class="table table-dark table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col">Nombre</th>
+                                <th scope="col">Precio</th>
+                                <th scope="col">Duración (días)</th>
+                                <th scope="col">Descripción</th>
+                                <th scope="col">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for plan in planes %}
+                            <tr>
+                                <td>{{ plan.nombre }}</td>
+                                <td>${{ plan.precio|floatformat:2 }}</td>
+                                <td>{{ plan.duracion_dias }}</td>
+                                <td>{{ plan.descripcion|default:"N/A"|truncatechars:30 }}</td>
+                                <td>
+                                    <a href="{% url 'editar_plan' plan_id=plan.id %}" class="btn btn-sm btn-info">Editar</a>
+                                    <form method="POST" action="{% url 'eliminar_registro' model_name='plan' pk=plan.id %}" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que quieres eliminar el plan {{ plan.nombre }}?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center">No hay planes de membresía creados.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card p-4 bg-dark text-white shadow">
+                <h3>Crear Nuevo Plan</h3>
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% for field in form %}
+                    <div class="mb-3">
+                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {% for error in field.errors %}
+                            <small class="text-danger d-block">{{ error }}</small>
+                        {% endfor %}
+                        {% if field.help_text %}
+                            <small class="form-text text-white-50">{{ field.help_text }}</small>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+
+                    <button type="submit" class="btn btn-success w-100 mt-2">Crear Plan</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary mt-4">← Volver al Dashboard</a>
+</div>
+{% endblock content %}

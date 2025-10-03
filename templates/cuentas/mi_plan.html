@@ -1,0 +1,87 @@
+{% extends "base.html" %} 
+{% load static %}
+
+{% block title %}Mi Plan{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-primary mb-4">⭐ Mi Plan de Membresía</h1>
+    
+    {% if membresia %}
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card p-4 bg-dark text-white shadow-lg">
+                    <h5 class="card-title text-warning">Detalles del Socio</h5>
+                    <ul class="list-group list-group-flush bg-dark">
+                        <li class="list-group-item bg-dark text-white">
+                            <i class="bi bi-person-fill me-2"></i> Usuario: <strong>{{ user.username }}</strong>
+                        </li>
+                        <li class="list-group-item bg-dark text-white">
+                            <i class="bi bi-envelope-fill me-2"></i> Email: <strong>{{ user.email }}</strong>
+                        </li>
+                        <li class="list-group-item bg-dark text-white">
+                            <i class="bi bi-tag-fill me-2"></i> Rol: <strong>{{ user.profile.rol }}</strong>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card p-4 bg-dark text-white shadow-lg">
+                    <h5 class="card-title text-success">Estado del Plan</h5>
+                    
+                    <p class="fs-4">Plan Actual: <strong class="text-success">{{ plan.nombre }}</strong></p>
+                    
+                    <p>Fecha de Inicio: <strong>{{ membresia.fecha_inicio|date:"d M Y" }}</strong></p>
+                    
+                    <p>Fecha de Vencimiento: <strong>{{ fecha_vencimiento|date:"d M Y" }}</strong></p>
+                    
+                    {% if dias_restantes > 0 %}
+                        <div class="alert alert-success mt-3" role="alert">
+                            Tu plan está **ACTIVO**. Te quedan **{{ dias_restantes }}** días.
+                        </div>
+                        <a href="#" class="btn btn-success mt-2">Renovar Plan Ahora</a>
+                    {% else %}
+                        <div class="alert alert-danger mt-3" role="alert">
+                            Tu plan ha **VENCIDO** o vence hoy. Por favor, renuévalo.
+                        </div>
+                        <a href="#" class="btn btn-danger mt-2">Renovar Plan Ahora</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+    {% else %}
+        
+        <div class="alert alert-warning text-dark text-center">
+            <p class="mb-0">¡Hola {{ user.username }}! No tienes una membresía activa en este momento.</p>
+        </div>
+
+        {% if planes_disponibles %}
+            <h2 class="text-light mt-5">Planes Disponibles</h2>
+            <div class="row">
+                {% for p in planes_disponibles %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card bg-secondary text-white p-3">
+                            <h4 class="card-title">{{ p.nombre }}</h4>
+                            <p class="fs-5">Costo: <strong>${{ p.precio|default:"N/A" }}</strong></p>
+                            <p>{{ p.descripcion|default:"Sin descripción." }}</p>
+                            <a href="#" class="btn btn-info">Contratar</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+    {% endif %}
+
+    <div class="mt-5">
+        <h2 class="text-light">Tus Próximas Clases</h2>
+        <div class="alert alert-secondary text-dark">
+            Aquí se mostraría la lista de las clases que reservaste (Implementación en `mis_clases_view`).
+        </div>
+    </div>
+
+</div>
+{% endblock content %}

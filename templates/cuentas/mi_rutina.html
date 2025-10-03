@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mi Rutina de Entrenamiento{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="text-white">Mi Rutina de Entrenamiento</h1>
+            <p class="lead text-white-50">Consulta tu plan de ejercicios personalizado asignado por tu Entrenador.</p>
+        </div>
+    </div>
+    
+    {% if rutinas %}
+        {% comment %} Solo mostramos la rutina más reciente, ya que la vista filtra por activa=True y ordena por fecha {% endcomment %}
+        {% with rutina_activa=rutinas.first %}
+        
+        <div class="card p-4 bg-dark text-white shadow">
+            
+            <h2 class="text-info">{{ rutina_activa.nombre }}</h2>
+            <p class="text-white-50">Asignada por: <strong>{{ rutina_activa.entrenador.get_full_name|default:rutina_activa.entrenador.username }}</strong></p>
+            <p class="text-white-50">Fecha de Asignación: {{ rutina_activa.fecha_asignacion|date:"d F Y" }}</p>
+
+            <hr class="text-white-50">
+            
+            <h4 class="mt-4 mb-3">Plan Detallado:</h4>
+            
+            <div class="rutina-contenido" style="white-space: pre-wrap;">
+                {{ rutina_activa.descripcion }}
+            </div>
+            
+            <hr class="mt-4 text-white-50">
+
+            <div class="alert alert-secondary text-dark">
+                <strong>Consejo:</strong> Recuerda consultar a tu entrenador si tienes dudas sobre la técnica de los ejercicios. ¡Dale con todo! 💪
+            </div>
+
+        </div>
+
+        {% endwith %}
+
+    {% else %}
+        <div class="alert alert-warning">
+            <h4 class="alert-heading">¡Aún no tienes una rutina activa!</h4>
+            <p>Tu Entrenador todavía no te ha asignado un plan de entrenamiento activo.</p>
+            <hr>
+            <p class="mb-0">Consulta con tu Entrenador para iniciar tu plan personalizado.</p>
+        </div>
+    {% endif %}
+
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary mt-4">← Volver al Dashboard</a>
+</div>
+{% endblock content %}

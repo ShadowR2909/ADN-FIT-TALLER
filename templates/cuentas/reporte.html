@@ -1,0 +1,57 @@
+{% extends "base.html" %} 
+{% load static %}
+
+{% block title %}Reportes{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-info mb-4">📊 Generador de Reportes</h1>
+    
+    <p class="lead text-white-50">Bienvenido, {{ user.get_username|capfirst }}. Como administrador, puedes generar informes clave del gimnasio.</p>
+
+    <div class="card p-4 bg-dark text-white shadow-lg">
+        <h5 class="card-title text-light">Selección de Reporte</h5>
+        
+        <form method="get" action="#">
+            <div class="row g-3">
+                
+                <div class="col-md-5">
+                    <label for="tipoReporte" class="form-label">Tipo de Informe:</label>
+                    <select id="tipoReporte" name="tipo" class="form-select bg-secondary text-white border-0">
+                        <option value="" disabled selected>Selecciona un reporte</option>
+                        <option value="ingresos">Reporte de Ingresos</option>
+                        <option value="asistencia">Asistencia de Socios</option>
+                        <option value="membresias">Vencimiento de Membresías</option>
+                        <option value="clases">Ocupación por Clase</option>
+                    </select>
+                </div>
+                
+                <div class="col-md-4">
+                    <label for="periodo" class="form-label">Período:</label>
+                    <select id="periodo" name="periodo" class="form-select bg-secondary text-white border-0">
+                        <option value="mes">Último Mes</option>
+                        <option value="trimestre">Último Trimestre</option>
+                        <option value="anio">Último Año</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-info w-100">
+                        <i class="bi bi-file-earmark-bar-graph"></i> Generar Reporte
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <hr class="mt-5 mb-4 border-secondary">
+    
+    <div class="mt-4">
+        <h2 class="text-white">Vista Previa</h2>
+        <div class="alert alert-secondary text-dark" role="alert">
+            Los resultados del reporte aparecerán aquí después de que la lógica del backend sea implementada.
+        </div>
+    </div>
+    
+</div>
+{% endblock content %}

@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="text-white">{{ titulo }}</h1>
+            <p class="lead text-white-50">Visualización de métricas y rendimiento del gimnasio. Aquí se integrarán los gráficos de datos.</p>
+        </div>
+    </div>
+
+    <ul class="nav nav-tabs mb-4" id="reportesTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="general-tab" data-bs-toggle="tab" data-bs-target="#general" type="button" role="tab" aria-controls="general" aria-selected="true">General</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="financiero-tab" data-bs-toggle="tab" data-bs-target="#financiero" type="button" role="tab" aria-controls="financiero" aria-selected="false">Financiero</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="usuarios-tab" data-bs-toggle="tab" data-bs-target="#usuarios" type="button" role="tab" aria-controls="usuarios" aria-selected="false">Usuarios</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="clases-tab" data-bs-toggle="tab" data-bs-target="#clases" type="button" role="tab" aria-controls="clases" aria-selected="false">Clases</button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="reportesTabContent">
+        
+        <div class="tab-pane fade show active" id="general" role="tabpanel" aria-labelledby="general-tab">
+            <h4 class="text-info mb-3">Resumen Rápido (Datos de Ejemplo)</h4>
+            <div class="row">
+                
+                <div class="col-md-4 mb-4">
+                    <div class="card bg-success text-white">
+                        <div class="card-body">
+                            <h5 class="card-title">Socios Activos</h5>
+                            <p class="card-text fs-2">125</p> 
+                            <small class="text-white-50">Cuentas con membresía no vencida.</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-4">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body">
+                            <h5 class="card-title">Nuevos Socios (Mes)</h5>
+                            <p class="card-text fs-2">15</p>
+                            <small class="text-white-50">Nuevos registros con membresía.</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-4">
+                    <div class="card bg-warning text-dark">
+                        <div class="card-body">
+                            <h5 class="card-title">Planes Más Vendidos</h5>
+                            <p class="card-text fs-5">Plan Semestral</p>
+                            <small class="text-dark-50">Basado en el último trimestre.</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="alert alert-info mt-4">
+                <strong>Área de Gráfico:</strong> Aquí se integrarán gráficos interactivos (ej. Chart.js o Plotly) para mostrar la tendencia de ingresos y la retención.
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="financiero" role="tabpanel" aria-labelledby="financiero-tab">
+            <div class="card p-4 bg-dark text-white">
+                <h4>Detalle Financiero</h4>
+                <p>Gráficos de **Ingresos por Mes**, **Gastos** y **Flujo de Caja**.</p>
+                <div class="alert alert-warning">Implementación pendiente de la lógica de contabilidad y cálculo.</div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="usuarios" role="tabpanel" aria-labelledby="usuarios-tab">
+            <div class="card p-4 bg-dark text-white">
+                <h4>Métricas de Socios</h4>
+                <p>Gráficos de **Retención de Socios**, **Distribución de Roles** y **Tasa de Abandono**.</p>
+                <div class="alert alert-warning">Implementación pendiente.</div>
+            </div>
+        </div>
+        
+        <div class="tab-pane fade" id="clases" role="tabpanel" aria-labelledby="clases-tab">
+            <div class="card p-4 bg-dark text-white">
+                <h4>Rendimiento de Clases</h4>
+                <p>Gráficos de **Clases Más Populares** (por inscripciones) y **Ocupación Promedio**.</p>
+                <div class="alert alert-warning">Implementación pendiente. Requiere el módulo de inscripción a clases.</div>
+            </div>
+        </div>
+        
+    </div>
+
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary mt-3">← Volver al Dashboard</a>
+</div>
+{% endblock %}

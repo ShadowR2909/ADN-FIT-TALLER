@@ -1,12 +1,72 @@
-{% extends "cuentas/base.html" %}
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Lista de Alumnos (Socios){% endblock %}
 
 {% block content %}
-<h2>Lista de Alumnos</h2>
-<p>Bienvenido {{ user.username }} ({{ user.profile.rol }})</p>
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="text-white">Mis Alumnos (Socios)</h1>
+            <p class="lead text-white-50">Lista de socios activos para la gestión de rutinas y planes.</p>
+        </div>
+    </div>
 
-<ul>
-    <li>Juan Pérez - Clase de Yoga</li>
-    <li>María López - Spinning</li>
-    <li>Carlos García - Pilates</li>
-</ul>
-{% endblock %}
+    <div class="card p-4 bg-dark text-white shadow">
+        <div class="table-responsive">
+            <table class="table table-dark table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Usuario</th>
+                        <th scope="col">Nombre Completo</th>
+                        <th scope="col">Membresía</th>
+                        <th scope="col">Rutina Asignada</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for socio in socios %}
+                    <tr>
+                        <th scope="row">{{ socio.id }}</th>
+                        <td>{{ socio.username }}</td>
+                        <td>{{ socio.first_name }} {{ socio.last_name }}</td>
+                        
+                        <td>
+                            {% with socio.gestion_membresia as membresia %}
+                                {% if membresia %}
+                                    <span class="badge bg-success">{{ membresia.plan.nombre }}</span>
+                                    <br><small>Vence: {{ membresia.fecha_vencimiento|date:"d M Y" }}</small>
+                                {% else %}
+                                    <span class="badge bg-warning">Sin Membresía</span>
+                                {% endif %}
+                            {% endwith %}
+                        </td>
+                        
+                        <td>
+                            {% with socio.rutinas_asignadas.last as ultima_rutina %}
+                                {% if ultima_rutina and ultima_rutina.activa %}
+                                    <span class="badge bg-info">{{ ultima_rutina.nombre }}</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Ninguna Activa</span>
+                                {% endif %}
+                            {% endwith %}
+                        </td>
+
+                        <td>
+                            <a href="{% url 'asignar_rutinas' %}" class="btn btn-sm btn-primary">Asignar Rutina</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center">No hay alumnos (socios) registrados en el sistema.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary mt-3 align-self-start">← Volver al Dashboard</a>
+    </div>
+
+</div>
+{% endblock content %}

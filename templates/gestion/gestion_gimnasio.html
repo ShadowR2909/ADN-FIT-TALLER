@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Gestión de Gimnasio{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-4 md:p-8">
+    <h1 class="text-3xl font-bold mb-6 text-white">Administración: Planes y Membresías</h1>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="p-3 rounded-lg text-white mb-4 
+                {% if message.tags == 'error' %}bg-red-600{% elif message.tags == 'success' %}bg-green-600{% else %}bg-blue-600{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="bg-gray-800 p-6 rounded-xl shadow-lg mb-8">
+        <h2 class="text-2xl font-semibold mb-4 text-white border-b border-gray-700 pb-2">Administrar Planes</h2>
+        
+        <h3 class="text-xl font-medium text-gray-300 mb-3">Crear Nuevo Plan</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="form_plan" value="true">
+            {% for field in form_plan %}
+                <div class="mb-3">
+                    <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-400 mb-1">{{ field.label }}</label>
+                    {{ field }}
+                    {% for error in field.errors %}<p class="text-red-400 text-xs italic">{{ error }}</p>{% endfor %}
+                </div>
+            {% endfor %}
+            <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded-lg transition duration-200">Guardar Plan</button>
+        </form>
+
+        <h3 class="text-xl font-medium text-gray-300 mt-6 mb-3 border-t border-gray-700 pt-4">Planes Existentes</h3>
+        <ul class="list-disc pl-5 text-gray-400">
+            {% for plan in planes %}
+            <li class="mb-1">
+                <span class="font-semibold text-white">{{ plan.nombre }}</span>: ${{ plan.precio }} por {{ plan.duracion_dias }} días.
+                <span class="text-xs italic">({{ plan.descripcion|truncatechars:50 }})</span>
+            </li>
+            {% empty %}
+            <li>No hay planes definidos aún.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="bg-gray-800 p-6 rounded-xl shadow-lg">
+        <h2 class="text-2xl font-semibold mb-4 text-white border-b border-gray-700 pb-2">Asignar / Renovar Membresía</h2>
+        
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="form_membresia" value="true">
+            {% for field in form_membresia %}
+                <div class="mb-3">
+                    <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-400 mb-1">{{ field.label }}</label>
+                    {{ field }}
+                    {% for error in field.errors %}<p class="text-red-400 text-xs italic">{{ error }}</p>{% endfor %}
+                </div>
+            {% endfor %}
+            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-lg transition duration-200">Asignar Membresía</button>
+        </form>
+
+        <h3 class="text-xl font-medium text-gray-300 mt-6 mb-3 border-t border-gray-700 pt-4">Membresías Activas</h3>
+        <ul class="list-disc pl-5 text-gray-400">
+            {% for membresia in membresias_activas %}
+            <li class="mb-1">
+                <span class="font-semibold text-white">{{ membresia.socio.username }}</span>: {{ membresia.plan.nombre }} (Vence: {{ membresia.fecha_vencimiento|date:"d M Y" }})
+            </li>
+            {% empty %}
+            <li>No hay membresías activas.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}
