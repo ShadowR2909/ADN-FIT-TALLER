@@ -8,7 +8,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from .forms import (
     RegistroUsuarioForm, 
     ProfileForm, 
-    # Asegúrate de importar RutinaForm desde donde corresponda
+    AdminProfileForm,
     RutinaForm, 
 )
 from .models import Profile
@@ -16,33 +16,35 @@ from .models import Profile
 from gestion.models import Rutina, Membresia, Plan 
 
 # Nota: Se asume que Clase e InscripcionClase existen y están importadas 
-# para que las vistas 'mis_clases' y 'mi_plan_view' funcionen.
-# Si no lo están, descomenta o añade sus importaciones aquí:
-# from gestion.models import Clase, InscripcionClase 
 try:
     from gestion.models import Clase, InscripcionClase
 except ImportError:
-    # Definiciones dummy si no existen (debes corregir tus imports reales)
     class Clase: pass
     class InscripcionClase: pass
 
 
+# ----------------------------------------------------------------------
 # --- Funciones de Comprobación de Roles ---
+# ----------------------------------------------------------------------
 
 def es_administrador(user):
+    """Verifica si el usuario tiene el rol de Administrador."""
     return user.is_authenticated and hasattr(user, 'profile') and user.profile.rol == 'Administrador'
 
 def es_entrenador(user):
-    # El administrador también puede realizar tareas de entrenador
+    """Verifica si el usuario tiene rol de Entrenador o Administrador."""
     return user.is_authenticated and hasattr(user, 'profile') and user.profile.rol in ['Entrenador', 'Administrador']
 
 def es_socio(user):
+    """Verifica si el usuario tiene el rol de Socio."""
     return user.is_authenticated and hasattr(user, 'profile') and user.profile.rol == 'Socio'
 
+# ----------------------------------------------------------------------
 # --- Vistas de Autenticación ---
+# ----------------------------------------------------------------------
 
 def login_view(request):
-    """VISTA DE LOGIN FUNCIONAL: Procesa la autenticación del usuario."""
+    """Procesa la autenticación del usuario."""
     if request.user.is_authenticated:
         return redirect('dashboard') 
         
@@ -70,7 +72,7 @@ def login_view(request):
 
 @transaction.atomic
 def register(request):
-    """VISTA DE REGISTRO: Registra un nuevo Socio."""
+    """Registra un nuevo Socio."""
     if request.method == 'POST':
         form = RegistroUsuarioForm(request.POST)
         if form.is_valid():
@@ -87,49 +89,59 @@ def register(request):
 
 @login_required
 def dashboard(request):
-    """DASHBOARD PRINCIPAL: Usa un solo template para todos los roles."""
+    """Dashboard principal. Redirige a la vista basada en el rol (implícitamente en el template)."""
     rol = request.user.profile.rol
     context = {'rol': rol} 
     return render(request, 'cuentas/dashboard.html', context)
 
-# --- Vistas de Perfil ---
+def logout_view(request):
+    """Cierra la sesión del usuario."""
+    logout(request)
+    messages.info(request, "Sesión cerrada con éxito.")
+    return redirect('login')
+
+# ----------------------------------------------------------------------
+# --- Vistas de Perfil (Usuario General) ---
+# ----------------------------------------------------------------------
 
 @login_required
 @transaction.atomic
 def editar_perfil(request):
-    """EDITAR PERFIL: Permite a cualquier usuario modificar su perfil."""
+    """Permite a cualquier usuario modificar su propio perfil."""
     profile = request.user.profile
     if request.method == 'POST':
-        # 🚨 CORRECCIÓN CLAVE 1: Pasar el usuario de la solicitud al formulario 🚨
-        form = ProfileForm(request.POST, instance=profile, user=request.user) 
+        # USAMOS ProfileForm: No incluye el campo 'rol', por lo que no fallará la validación.
+        # Ya NO pasamos user=request.user, pues la lógica de rol ya no está en este formulario.
+        form = ProfileForm(request.POST, instance=profile) 
         
         if form.is_valid():
-            # El formulario, si el campo 'rol' está deshabilitado, NO lo incluye en cleaned_data, 
-            # asegurando que el rol no se modifique, incluso con un POST manipulado.
             form.save()
             messages.success(request, "Perfil actualizado exitosamente.")
             return redirect('editar_perfil')
         else:
+            # Ahora, el error que se mostraba en el campo 'Rol' debería haber desaparecido.
             messages.error(request, "Error al actualizar el perfil.")
     else:
-        # 🚨 CORRECCIÓN CLAVE 2: Pasar el usuario de la solicitud al formulario en GET 🚨
-        form = ProfileForm(instance=profile, user=request.user)
+        # Inicializa el formulario para mostrar los datos existentes.
+        form = ProfileForm(instance=profile)
         
     return render(request, 'cuentas/editar_perfil.html', {'form': form})
 
+# ----------------------------------------------------------------------
 # --- Vistas de Administración y Entrenador ---
+# ----------------------------------------------------------------------
 
 @login_required
 @user_passes_test(es_administrador)
 def gestion_usuarios(request):
-    """GESTION DE USUARIOS: Muestra lista de todos los usuarios (Solo Admin)."""
+    """Muestra lista de todos los usuarios (Solo Admin)."""
     usuarios = User.objects.all().order_by('username')
     return render(request, 'cuentas/gestion_usuarios.html', {'usuarios': usuarios})
 
 @login_required
 @user_passes_test(es_entrenador)
 def lista_alumnos(request):
-    """LISTA DE ALUMNOS (SOCIOS): Muestra solo usuarios con rol 'Socio'."""
+    """Muestra solo usuarios con rol 'Socio'."""
     socios = User.objects.filter(profile__rol='Socio').order_by('last_name')
     return render(request, 'cuentas/lista_alumnos.html', {'socios': socios})
 
@@ -137,22 +149,15 @@ def lista_alumnos(request):
 @user_passes_test(es_administrador)
 @transaction.atomic
 def editar_usuario_view(request, user_id):
-    """
-    Permite al Administrador editar un usuario (rol, activo, etc.) y su perfil.
-    """
+    """Permite al Administrador editar un usuario (incluyendo el rol)."""
     usuario_a_editar = get_object_or_404(User, id=user_id)
     profile = get_object_or_404(Profile, user=usuario_a_editar)
     
-    # 🚨 NOTA: Aquí no es necesario pasar 'user=request.user' si el Admin debe poder editar
-    # el rol, y el formulario solo deshabilita para NO-Superusuarios.
-    # Pero lo hacemos para mantener la coherencia con el formulario, aunque aquí el 
-    # Administrador probablemente debería tener un formulario diferente sin la restricción.
-    
     if request.method == 'POST':
-        # Pasamos el usuario (que es Administrador) para que el formulario sepa que puede editar el rol
-        profile_form = ProfileForm(request.POST, instance=profile, user=request.user) 
+        # 🚨 USAMOS AdminProfileForm: Este formulario SÍ incluye el campo 'rol'. 🚨
+        profile_form = AdminProfileForm(request.POST, instance=profile) 
         
-        # --- Lógica para el estado is_active ---
+        # --- Lógica para el estado is_active (campo del modelo User) ---
         is_active_new_status = request.POST.get('is_active')
         usuario_a_editar.is_active = (is_active_new_status == 'on') 
         # ----------------------------------------
@@ -160,6 +165,7 @@ def editar_usuario_view(request, user_id):
         if profile_form.is_valid():
             profile_form.save()
             
+            # Guardamos el estado activo/inactivo en el objeto User
             usuario_a_editar.save() 
             
             messages.success(request, f"Usuario '{usuario_a_editar.username}' actualizado exitosamente. Estado Activo: {usuario_a_editar.is_active}")
@@ -167,8 +173,8 @@ def editar_usuario_view(request, user_id):
         else:
             messages.error(request, "Error al actualizar el usuario. Revisa el formulario.")
     else:
-        # Pasamos el usuario (que es Administrador) en GET
-        profile_form = ProfileForm(instance=profile, user=request.user)
+        # Inicializamos con AdminProfileForm para mostrar el campo 'rol'
+        profile_form = AdminProfileForm(instance=profile)
         
     context = {
         'usuario_a_editar': usuario_a_editar,
@@ -178,11 +184,10 @@ def editar_usuario_view(request, user_id):
     
     return render(request, 'cuentas/editar_usuario.html', context)
 
-
 @login_required
 @user_passes_test(es_entrenador)
 def asignar_rutinas_view(request):
-    """ASIGNAR RUTINAS: Permite al entrenador asignar rutinas a sus alumnos."""
+    """Permite al entrenador asignar rutinas a sus alumnos."""
     if request.method == 'POST':
         form = RutinaForm(request.POST) 
         if form.is_valid():
@@ -206,14 +211,16 @@ def asignar_rutinas_view(request):
     return render(request, 'cuentas/asignar_rutinas.html', context)
 
 
+# ----------------------------------------------------------------------
 # --- Vistas del Socio ---
+# ----------------------------------------------------------------------
 
 @login_required
 @user_passes_test(es_socio)
 def mi_plan_view(request):
-    """VER MI PLAN/MEMBRESÍA: Muestra la membresía activa del socio."""
+    """Muestra la membresía activa del socio."""
     try:
-        # Asumiendo que definiste el related_name='gestion_membresia' en gestion/models.py
+        # Se asume related_name='gestion_membresia'
         membresia = request.user.gestion_membresia 
     except Membresia.DoesNotExist:
         membresia = None
@@ -224,13 +231,10 @@ def mi_plan_view(request):
 @login_required
 @user_passes_test(es_socio)
 def mis_clases(request):
-    """
-    Muestra el horario de clases disponibles y maneja la inscripción.
-    """
+    """Muestra el horario de clases disponibles y maneja la inscripción."""
     clases_disponibles = Clase.objects.all().order_by('dia_semana', 'hora_inicio')
     
     # Obtener las clases a las que el usuario ya está inscrito
-    # Se asume que InscripcionClase.socio apunta a User
     clases_inscritas = InscripcionClase.objects.filter(socio=request.user).values_list('clase_id', flat=True)
     
     if request.method == 'POST':
@@ -261,7 +265,7 @@ def mis_clases(request):
 @login_required
 @user_passes_test(es_socio)
 def mi_rutina_view(request):
-    """VER MI RUTINA: Muestra las rutinas activas asignadas por el entrenador."""
+    """Muestra las rutinas activas asignadas por el entrenador."""
     rutinas = Rutina.objects.filter(
         socio=request.user, 
         activa=True
@@ -274,15 +278,9 @@ def mi_rutina_view(request):
 
 @login_required
 def mi_membresia(request):
+    """Vista para ver detalles de la membresía (asume una relación directa)."""
     try:
         membresia = request.user.membresia 
     except Membresia.DoesNotExist:
         membresia = None
     return render(request, 'cuentas/mi_membresia.html', {'membresia': membresia})
-
-# Vistas auxiliares si se necesitan en urls.py
-def logout_view(request):
-    """Cierra la sesión del usuario."""
-    logout(request)
-    messages.info(request, "Sesión cerrada con éxito.")
-    return redirect('login')

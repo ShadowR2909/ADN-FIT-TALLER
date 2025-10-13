@@ -1,4 +1,3 @@
-# cuentas/forms.py
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
@@ -6,7 +5,10 @@ from django.db import transaction
 from .models import Profile 
 from gestion.models import Rutina 
 
+# ----------------------------------------------------------------------
 # --- 1. Formulario de Registro Público ---
+# Descripción: Utilizado para que nuevos usuarios se registren como 'Socio' por defecto.
+# ----------------------------------------------------------------------
 
 class RegistroUsuarioForm(UserCreationForm):
     # Campos adicionales para el modelo User
@@ -33,7 +35,7 @@ class RegistroUsuarioForm(UserCreationForm):
         if commit:
             user.save()
             
-            # Verifica que no exista un perfil para este usuario antes de crear
+            # Crea el Profile con el rol 'Socio' por defecto
             if not Profile.objects.filter(user=user).exists():
                 Profile.objects.create(
                     user=user,
@@ -43,20 +45,25 @@ class RegistroUsuarioForm(UserCreationForm):
         return user
 
 
+# ----------------------------------------------------------------------
 # --- 2. Formulario para Editar Perfil (User + Profile) ---
+# Descripción: Usado por CUALQUIER usuario para editar SU PROPIO perfil.
+#              CRÍTICO: Excluye el campo 'rol' para evitar que el usuario lo cambie
+#                       y para evitar el error de "obligatorio" al guardar.
+# ----------------------------------------------------------------------
 
 class ProfileForm(forms.ModelForm):
+    # Campos del modelo User que se editan junto con Profile
     first_name = forms.CharField(max_length=150, required=False, label='Nombre')
     last_name = forms.CharField(max_length=150, required=False, label='Apellido')
     email = forms.EmailField(required=True, label='Correo Electrónico')
     
     class Meta:
         model = Profile
-        # 'rol' se incluye para mostrarlo, pero será deshabilitado
-        fields = ["telefono", "rol", "fecha_nacimiento"] 
+        # 🚨 CORRECCIÓN CRÍTICA: EXCLUIMOS 'rol' para evitar el error de campo obligatorio.
+        fields = ["telefono", "fecha_nacimiento"] 
         labels = {
             "telefono": "Teléfono",
-            "rol": "Rol",
             "fecha_nacimiento": "Fecha de Nacimiento"
         }
         widgets = {
@@ -64,55 +71,68 @@ class ProfileForm(forms.ModelForm):
         }
         
     def __init__(self, *args, **kwargs):
-        # 🚨 Cambios Críticos: Usamos 'user_requesting' para la lógica de rol 🚨
-        
-        # 1. Recuperamos el usuario que está haciendo la solicitud (pasado por la vista)
-        user_requesting = kwargs.pop('user', None) 
+        # Eliminamos el pop de 'user' ya que ya no se necesita para la lógica del rol aquí.
+        kwargs.pop('user', None) 
         super().__init__(*args, **kwargs)
         
-        # 2. Rellenar campos de User (nombre, apellido, email)
+        # Inicializar campos del modelo User
         if self.instance.pk:
             self.initial['first_name'] = self.instance.user.first_name
             self.initial['last_name'] = self.instance.user.last_name
             self.initial['email'] = self.instance.user.email
             
-        # 3. Aplicar estilo e inhabilitar el campo 'rol' para la seguridad
-        for field_name, field in self.fields.items():
-            # Aplicar estilo
+        # Aplicar estilo
+        for field in self.fields.values():
             if field.widget.__class__ != forms.DateInput: 
                 field.widget.attrs.update({'class': 'form-control bg-secondary text-white border-0'})
-            
-            # 🚨 INHABILITAR CAMPO 'ROL' PARA TODOS 🚨
-            if field_name == 'rol':
-                # Por defecto, el rol es de solo lectura y no editable en esta vista
-                field.widget.attrs['readonly'] = True # Muestra el campo pero evita el cambio
-                field.widget.attrs['disabled'] = True # La opción más segura: el valor no se envía al POST
-                field.help_text = "El rol no puede ser modificado desde esta vista de perfil."
-                
-                # Opcional: Si solo quieres que Superusuarios puedan editarlo
-                # if user_requesting and user_requesting.is_superuser:
-                #     field.widget.attrs.pop('disabled', None)
-                #     field.widget.attrs.pop('readonly', None)
-                #     field.help_text = "Rol editable (Superusuario)."
                 
     @transaction.atomic
     def save(self, commit=True):
+        # Guardar los datos del Profile (teléfono, fecha_nacimiento)
         profile = super().save(commit=commit)
         
+        # Guardar los datos del User (nombre, apellido, email)
         user = profile.user
         user.first_name = self.cleaned_data.get('first_name')
         user.last_name = self.cleaned_data.get('last_name')
         user.email = self.cleaned_data.get('email')
-        
-        # 🚨 Nota Importante: El campo 'rol' no estará en self.cleaned_data si fue deshabilitado 🚨
-        # No se necesita lógica adicional aquí para el rol, ya que el navegador no lo envía.
         
         if commit:
             user.save()
             
         return profile
 
+
+# ----------------------------------------------------------------------
+# --- 2b. Formulario para Edición de Perfil por el Administrador ---
+# Descripción: Usado SOLO en la vista editar_usuario_view para que el Admin
+#              pueda cambiar el rol de OTROS usuarios.
+# ----------------------------------------------------------------------
+
+class AdminProfileForm(ProfileForm):
+    # Hereda todos los campos de ProfileForm (first_name, last_name, email, telefono, fecha_nacimiento)
+    
+    class Meta(ProfileForm.Meta):
+        # AÑADIMOS 'rol' para que el Administrador pueda editarlo
+        fields = ProfileForm.Meta.fields + ["rol"] 
+        
+        # Aseguramos que el label 'rol' se muestre
+        labels = ProfileForm.Meta.labels
+        labels["rol"] = "Rol de Usuario" 
+        
+    def __init__(self, *args, **kwargs):
+        # Eliminamos 'user' ya que solo se usa para seguridad en ProfileForm
+        kwargs.pop('user', None) 
+        super().__init__(*args, **kwargs)
+        
+        # Aplicar estilo al campo 'rol'
+        if 'rol' in self.fields:
+             self.fields['rol'].widget.attrs.update({'class': 'form-control bg-secondary text-white border-0'})
+             
+# ----------------------------------------------------------------------
 # --- 3. Formulario de Asignación de Rutinas (Entrenador) ---
+# Descripción: Permite al entrenador crear y asignar una rutina.
+# ----------------------------------------------------------------------
 
 class RutinaForm(forms.ModelForm):
     """
