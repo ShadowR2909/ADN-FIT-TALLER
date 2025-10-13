@@ -24,32 +24,40 @@
         <tbody>
             {% for turno in mis_reservas %}
             <tr>
-                <td>{{ turno.fecha_hora_inicio|date:"d M Y" }} a las {{ turno.fecha_hora_inicio|time:"H:i" }}</td>
                 <td>
+                    {# 🚨 CORRECCIÓN: Usar hora_inicio y hora_fin para mostrar la fecha y el rango #}
+                    <strong>{{ turno.hora_inicio|date:"l, d M" }}</strong><br>
+                    {{ turno.hora_inicio|time:"H:i" }} - {{ turno.hora_fin|time:"H:i" }}
+                </td>
+                <td>
+                    {# Uso de Badges/Clases para el Estado (similar a staff_turno_list) #}
                     {% if turno.estado == 'CONFIRMADO' %}
                         <span class="badge bg-success">{{ turno.estado }}</span>
                     {% elif turno.estado == 'PENDIENTE' %}
                         <span class="badge bg-warning text-dark">{{ turno.estado }}</span>
                     {% elif turno.estado == 'CANCELADO' %}
                         <span class="badge bg-danger">{{ turno.estado }}</span>
-                    {% else %}
+                    {% elif turno.estado == 'FINALIZADO' %}
                         <span class="badge bg-secondary">{{ turno.estado }}</span>
+                    {% else %}
+                        {{ turno.estado }}
                     {% endif %}
                 </td>
                 <td>
+                    {# Lógica de Acciones: Solo se puede cancelar si está CONFIRMADO #}
                     {% if turno.estado == 'CONFIRMADO' %}
-                        {# Formulario para cancelar usando POST #}
                         <form method="post" action="{% url 'turnos:cancelar' turno.pk %}" style="display:inline;">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-danger" 
-                                onclick="return confirm('¿Estás seguro de que quieres cancelar este turno?');">
-                                Cancelar
-                            </button>
+                            <button type="submit" class="btn btn-sm btn-danger">Cancelar</button>
                         </form>
                     {% else %}
-                        <span class="text-muted">No editable</span>
+                        No editable
                     {% endif %}
                 </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3">Aún no tienes turnos reservados.</td>
             </tr>
             {% endfor %}
         </tbody>

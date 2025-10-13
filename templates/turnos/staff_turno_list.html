@@ -23,17 +23,42 @@
         <tbody>
             {% for turno in todos_los_turnos %}
             <tr>
-                <td>{{ turno.fecha_hora_inicio|date:"d M H:i" }}</td>
-                <td>{{ turno.socio.username|default:"N/A (PENDIENTE)" }}</td>
                 <td>
-                    <span class="badge bg-{% if turno.estado == 'CONFIRMADO' %}success{% elif turno.estado == 'PENDIENTE' %}warning text-dark{% elif turno.estado == 'CANCELADO' %}danger{% else %}secondary{% endif %}">
+                    {# 🚨 CORRECCIÓN 1: Formateo de fecha y hora. Asegúrate de que las horas sean diferentes #}
+                    <strong>{{ turno.hora_inicio|date:"l, d M" }}</strong><br>
+                    {{ turno.hora_inicio|time:"H:i" }} - {{ turno.hora_fin|time:"H:i" }}
+                </td>
+                <td>
+                    {# Muestra el nombre del socio o indica si es cupo libre #}
+                    {% if turno.socio %}
+                        {{ turno.socio.username }}
+                    {% else %}
+                        N/A (PENDIENTE)
+                    {% endif %}
+                </td>
+                <td>
+                    {# 🚨 CORRECCIÓN 2: Uso de Badges/Clases para el Estado #}
+                    {# Asume que tienes clases CSS/Bootstrap definidas como 'bg-confirmado', 'bg-pendiente', etc. #}
+                    {% if turno.estado == 'CONFIRMADO' %}
+                        <span class="badge bg-success">{{ turno.estado }}</span>
+                    {% elif turno.estado == 'PENDIENTE' %}
+                        <span class="badge bg-warning text-dark">{{ turno.estado }}</span>
+                    {% elif turno.estado == 'CANCELADO' %}
+                        <span class="badge bg-danger">{{ turno.estado }}</span>
+                    {% elif turno.estado == 'FINALIZADO' %}
+                        <span class="badge bg-secondary">{{ turno.estado }}</span>
+                    {% else %}
                         {{ turno.estado }}
-                    </span>
+                    {% endif %}
                 </td>
                 <td>
+                    {# 🚨 CORRECCIÓN 3: Asegura el botón "Editar" #}
                     <a href="{% url 'turnos:turno_update' turno.pk %}" class="btn btn-sm btn-info">Editar</a>
-                    {# Agrega aquí botones de FINALIZAR o ELIMINAR si es necesario #}
                 </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">No hay turnos registrados en el sistema.</td>
             </tr>
             {% endfor %}
         </tbody>

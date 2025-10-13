@@ -32,10 +32,16 @@ class TurnosDisponiblesView(LoginRequiredMixin, ListView):
     template_name = 'turnos/socio_disponibles.html'
     context_object_name = 'turnos_disponibles'
 
+    # 🚨 CORRECCIÓN 1: Usar 'hora_inicio' en el ordering de la clase
+    ordering = ['hora_inicio'] 
+
     def get_queryset(self):
         """Filtra turnos que están PENDIENTES y no tienen socio asignado (o no es el actual)."""
         # IMPORTANTE: Asumimos que los turnos creados por Staff tienen socio=None
-        return Turno.objects.filter(estado='PENDIENTE', socio__isnull=True).order_by('fecha_hora_inicio')
+        return Turno.objects.filter(
+            estado='PENDIENTE', 
+            socio__isnull=True
+            ).order_by('hora_inicio') # 🚨 CORRECCIÓN 2: Usar 'hora_inicio' en el filtro
 
 
 class TurnosMisReservasView(LoginRequiredMixin, ListView):
@@ -46,7 +52,9 @@ class TurnosMisReservasView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         """Muestra todos los turnos del socio actual."""
-        return Turno.objects.filter(socio=self.request.user).order_by('fecha_hora_inicio')
+        return Turno.objects.filter(
+            socio=self.request.user
+            ).order_by('hora_inicio') # 🚨 CORRECCIÓN 3: Usar 'hora_inicio' en el filtro
 
 
 class TomarTurnoView(LoginRequiredMixin, View):
@@ -110,7 +118,6 @@ class TurnoCreationStaffView(StaffRequiredMixin, CreateView):
         socio_seleccionado = form.cleaned_data.get('socio')
         
         # El formulario ya incluye 'socio' y 'estado' en cleaned_data si es Staff.
-        # Al no usar commit=False, permitimos que el formulario se encargue de la asignación.
         
         # 1. Validación de Cupo
         try:
@@ -122,16 +129,12 @@ class TurnoCreationStaffView(StaffRequiredMixin, CreateView):
 
         # 2. Mensaje de Éxito
         if socio_seleccionado:
-            # El formulario ya asignó el socio y el estado.
             messages.success(self.request, f"Turno asignado y CONFIRMADO para {socio_seleccionado.username}.")
         else:
-            # El formulario asignó socio=None y estado=PENDIENTE (o el seleccionado por el Staff).
             messages.success(self.request, "Cupo de turno creado con éxito. Disponible para reserva.")
         
         # Ahora llamamos al super() para guardar.
         return super().form_valid(form)
-
-
 
 
 class StaffTurnoListView(StaffRequiredMixin, ListView):
@@ -139,7 +142,8 @@ class StaffTurnoListView(StaffRequiredMixin, ListView):
     model = Turno
     template_name = 'turnos/staff_turno_list.html'
     context_object_name = 'todos_los_turnos'
-    ordering = ['-fecha_hora_inicio']
+    # 🚨 CORRECCIÓN 4: Usar 'hora_inicio' en el ordenamiento
+    ordering = ['-hora_inicio'] 
 
 
 class TurnoUpdateView(StaffRequiredMixin, UpdateView):
