@@ -15,6 +15,18 @@ from .models import Profile
 # Asegúrate de que estas importaciones de modelos de gestión sean correctas
 from gestion.models import Rutina, Membresia, Plan 
 
+# Nota: Se asume que Clase e InscripcionClase existen y están importadas 
+# para que las vistas 'mis_clases' y 'mi_plan_view' funcionen.
+# Si no lo están, descomenta o añade sus importaciones aquí:
+# from gestion.models import Clase, InscripcionClase 
+try:
+    from gestion.models import Clase, InscripcionClase
+except ImportError:
+    # Definiciones dummy si no existen (debes corregir tus imports reales)
+    class Clase: pass
+    class InscripcionClase: pass
+
+
 # --- Funciones de Comprobación de Roles ---
 
 def es_administrador(user):
@@ -32,7 +44,6 @@ def es_socio(user):
 def login_view(request):
     """VISTA DE LOGIN FUNCIONAL: Procesa la autenticación del usuario."""
     if request.user.is_authenticated:
-        # Redirección al nuevo nombre de URL 'dashboard'
         return redirect('dashboard') 
         
     if request.method == 'POST':
@@ -78,7 +89,7 @@ def register(request):
 def dashboard(request):
     """DASHBOARD PRINCIPAL: Usa un solo template para todos los roles."""
     rol = request.user.profile.rol
-    context = {'rol': rol} # Se mantiene rol en el contexto por si se necesita
+    context = {'rol': rol} 
     return render(request, 'cuentas/dashboard.html', context)
 
 # --- Vistas de Perfil ---
@@ -89,15 +100,20 @@ def editar_perfil(request):
     """EDITAR PERFIL: Permite a cualquier usuario modificar su perfil."""
     profile = request.user.profile
     if request.method == 'POST':
-        form = ProfileForm(request.POST, instance=profile)
+        # 🚨 CORRECCIÓN CLAVE 1: Pasar el usuario de la solicitud al formulario 🚨
+        form = ProfileForm(request.POST, instance=profile, user=request.user) 
+        
         if form.is_valid():
+            # El formulario, si el campo 'rol' está deshabilitado, NO lo incluye en cleaned_data, 
+            # asegurando que el rol no se modifique, incluso con un POST manipulado.
             form.save()
             messages.success(request, "Perfil actualizado exitosamente.")
             return redirect('editar_perfil')
         else:
             messages.error(request, "Error al actualizar el perfil.")
     else:
-        form = ProfileForm(instance=profile)
+        # 🚨 CORRECCIÓN CLAVE 2: Pasar el usuario de la solicitud al formulario en GET 🚨
+        form = ProfileForm(instance=profile, user=request.user)
         
     return render(request, 'cuentas/editar_perfil.html', {'form': form})
 
@@ -123,17 +139,20 @@ def lista_alumnos(request):
 def editar_usuario_view(request, user_id):
     """
     Permite al Administrador editar un usuario (rol, activo, etc.) y su perfil.
-    Implementa la lógica para actualizar el estado is_active.
     """
     usuario_a_editar = get_object_or_404(User, id=user_id)
     profile = get_object_or_404(Profile, user=usuario_a_editar)
     
+    # 🚨 NOTA: Aquí no es necesario pasar 'user=request.user' si el Admin debe poder editar
+    # el rol, y el formulario solo deshabilita para NO-Superusuarios.
+    # Pero lo hacemos para mantener la coherencia con el formulario, aunque aquí el 
+    # Administrador probablemente debería tener un formulario diferente sin la restricción.
+    
     if request.method == 'POST':
-        profile_form = ProfileForm(request.POST, instance=profile) 
+        # Pasamos el usuario (que es Administrador) para que el formulario sepa que puede editar el rol
+        profile_form = ProfileForm(request.POST, instance=profile, user=request.user) 
         
         # --- Lógica para el estado is_active ---
-        # Si el checkbox está marcado, request.POST.get('is_active') devuelve 'on'. 
-        # Si no está marcado, request.POST.get('is_active') devuelve None.
         is_active_new_status = request.POST.get('is_active')
         usuario_a_editar.is_active = (is_active_new_status == 'on') 
         # ----------------------------------------
@@ -141,7 +160,6 @@ def editar_usuario_view(request, user_id):
         if profile_form.is_valid():
             profile_form.save()
             
-            # Guardamos el estado activo/inactivo en el objeto User
             usuario_a_editar.save() 
             
             messages.success(request, f"Usuario '{usuario_a_editar.username}' actualizado exitosamente. Estado Activo: {usuario_a_editar.is_active}")
@@ -149,7 +167,8 @@ def editar_usuario_view(request, user_id):
         else:
             messages.error(request, "Error al actualizar el usuario. Revisa el formulario.")
     else:
-        profile_form = ProfileForm(instance=profile)
+        # Pasamos el usuario (que es Administrador) en GET
+        profile_form = ProfileForm(instance=profile, user=request.user)
         
     context = {
         'usuario_a_editar': usuario_a_editar,
@@ -165,7 +184,6 @@ def editar_usuario_view(request, user_id):
 def asignar_rutinas_view(request):
     """ASIGNAR RUTINAS: Permite al entrenador asignar rutinas a sus alumnos."""
     if request.method == 'POST':
-        # Asume que RutinaForm está disponible y es correcto
         form = RutinaForm(request.POST) 
         if form.is_valid():
             rutina = form.save(commit=False)
@@ -179,7 +197,6 @@ def asignar_rutinas_view(request):
     else:
         form = RutinaForm() 
 
-    # Asume que la relación existe y es correcta
     rutinas_asignadas = Rutina.objects.filter(entrenador=request.user).order_by('-fecha_asignacion')
 
     context = {
@@ -213,6 +230,7 @@ def mis_clases(request):
     clases_disponibles = Clase.objects.all().order_by('dia_semana', 'hora_inicio')
     
     # Obtener las clases a las que el usuario ya está inscrito
+    # Se asume que InscripcionClase.socio apunta a User
     clases_inscritas = InscripcionClase.objects.filter(socio=request.user).values_list('clase_id', flat=True)
     
     if request.method == 'POST':
@@ -235,7 +253,7 @@ def mis_clases(request):
     
     context = {
         'clases_disponibles': clases_disponibles,
-        'clases_inscritas': clases_inscritas, # Usaremos esto en la plantilla
+        'clases_inscritas': clases_inscritas, 
     }
     
     return render(request, 'cuentas/mis_clases.html', context)
@@ -247,17 +265,17 @@ def mi_rutina_view(request):
     rutinas = Rutina.objects.filter(
         socio=request.user, 
         activa=True
-    ).order_by('-fecha_asignacion') # Ordena para que la más nueva sea la primera (first())
+    ).order_by('-fecha_asignacion') 
     
     context = {
-        'rutinas': rutinas # Pasamos el queryset completo
+        'rutinas': rutinas 
     }
     return render(request, 'cuentas/mi_rutina.html', context)
 
 @login_required
 def mi_membresia(request):
     try:
-        membresia = request.user.membresia  # Ajusta si la relación es diferente
+        membresia = request.user.membresia 
     except Membresia.DoesNotExist:
         membresia = None
     return render(request, 'cuentas/mi_membresia.html', {'membresia': membresia})

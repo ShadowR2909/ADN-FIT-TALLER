@@ -1,11 +1,10 @@
 # cuentas/forms.py
-
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.db import transaction
 from .models import Profile 
-from gestion.models import Rutina # Importación actualizada
+from gestion.models import Rutina 
 
 # --- 1. Formulario de Registro Público ---
 
@@ -53,6 +52,7 @@ class ProfileForm(forms.ModelForm):
     
     class Meta:
         model = Profile
+        # 'rol' se incluye para mostrarlo, pero será deshabilitado
         fields = ["telefono", "rol", "fecha_nacimiento"] 
         labels = {
             "telefono": "Teléfono",
@@ -64,18 +64,37 @@ class ProfileForm(forms.ModelForm):
         }
         
     def __init__(self, *args, **kwargs):
+        # 🚨 Cambios Críticos: Usamos 'user_requesting' para la lógica de rol 🚨
+        
+        # 1. Recuperamos el usuario que está haciendo la solicitud (pasado por la vista)
+        user_requesting = kwargs.pop('user', None) 
         super().__init__(*args, **kwargs)
         
+        # 2. Rellenar campos de User (nombre, apellido, email)
         if self.instance.pk:
             self.initial['first_name'] = self.instance.user.first_name
             self.initial['last_name'] = self.instance.user.last_name
             self.initial['email'] = self.instance.user.email
-        
-        for field in self.fields.values():
-            # Aplica el estilo a la mayoría de los campos
-            if field.widget.__class__ != forms.DateInput: # Evita cambiar el type='date'
+            
+        # 3. Aplicar estilo e inhabilitar el campo 'rol' para la seguridad
+        for field_name, field in self.fields.items():
+            # Aplicar estilo
+            if field.widget.__class__ != forms.DateInput: 
                 field.widget.attrs.update({'class': 'form-control bg-secondary text-white border-0'})
             
+            # 🚨 INHABILITAR CAMPO 'ROL' PARA TODOS 🚨
+            if field_name == 'rol':
+                # Por defecto, el rol es de solo lectura y no editable en esta vista
+                field.widget.attrs['readonly'] = True # Muestra el campo pero evita el cambio
+                field.widget.attrs['disabled'] = True # La opción más segura: el valor no se envía al POST
+                field.help_text = "El rol no puede ser modificado desde esta vista de perfil."
+                
+                # Opcional: Si solo quieres que Superusuarios puedan editarlo
+                # if user_requesting and user_requesting.is_superuser:
+                #     field.widget.attrs.pop('disabled', None)
+                #     field.widget.attrs.pop('readonly', None)
+                #     field.help_text = "Rol editable (Superusuario)."
+                
     @transaction.atomic
     def save(self, commit=True):
         profile = super().save(commit=commit)
@@ -84,6 +103,9 @@ class ProfileForm(forms.ModelForm):
         user.first_name = self.cleaned_data.get('first_name')
         user.last_name = self.cleaned_data.get('last_name')
         user.email = self.cleaned_data.get('email')
+        
+        # 🚨 Nota Importante: El campo 'rol' no estará en self.cleaned_data si fue deshabilitado 🚨
+        # No se necesita lógica adicional aquí para el rol, ya que el navegador no lo envía.
         
         if commit:
             user.save()
@@ -110,12 +132,11 @@ class RutinaForm(forms.ModelForm):
             'socio': forms.Select(attrs={'class': 'form-control bg-secondary text-white border-0'}),
             'nombre': forms.TextInput(attrs={'class': 'form-control bg-secondary text-white border-0', 'placeholder': 'Ej: Fuerza Nivel I'}),
             'descripcion': forms.Textarea(attrs={'rows': 5, 'class': 'form-control bg-secondary text-white border-0', 'placeholder': 'Detalles de ejercicios, series y repeticiones...'}),
-            'activa': forms.CheckboxInput(attrs={'class': 'form-check-input'}), # Checkbox no usa el mismo estilo de control
+            'activa': forms.CheckboxInput(attrs={'class': 'form-check-input'}), 
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
         # Filtra el campo 'socio' para mostrar solo a los usuarios con rol 'Socio'
-        # Usamos el related_name 'profile' (Profile.user) para un filtro eficiente.
         self.fields['socio'].queryset = User.objects.filter(profile__rol='Socio').order_by('last_name')

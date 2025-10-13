@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 # --- Modelo de Perfil (Único Modelo en esta App) ---
 
@@ -25,4 +27,18 @@ class Profile(models.Model):
     def __str__(self): 
         return f'Perfil de {self.user.username} ({self.rol})'
 
-# NOTA: Los modelos Plan, Membresia, Clase y Rutina han sido movidos a la app 'gestion'.
+# ----------------------------------------------------
+# 🚨 SEÑALES PARA CREACIÓN AUTOMÁTICA DEL PERFIL 🚨
+# ----------------------------------------------------
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    """Crea un objeto Profile automáticamente cuando se crea un User."""
+    if created:
+        # El campo 'rol' se inicializa con el valor 'Socio' por defecto del modelo
+        Profile.objects.create(user=instance)
+
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+    """Guarda el objeto Profile cuando se guarda el User."""
+    instance.profile.save()

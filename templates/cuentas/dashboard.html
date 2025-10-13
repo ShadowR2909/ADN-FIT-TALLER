@@ -6,10 +6,8 @@
 {% block content %}
 <div class="container mt-4">
     
-    <!-- Título y Rol -->
     <div class="row mb-4">
         <div class="col-12">
-            <!-- Usamos user.get_username para obtener el nombre de usuario -->
             <h1 class="text-white">Bienvenido/a, {{ user.get_username|capfirst }}</h1>
             <p class="lead text-white-50">Rol actual: <span class="badge bg-success">{{ user.profile.rol|capfirst }}</span></p>
         </div>
@@ -19,14 +17,22 @@
         <h2>Panel de Acceso Rápido</h2>
         <p>Utiliza los enlaces a continuación según tu rol y permisos.</p>
         
-        <!-- Lógica de Enlaces por Rol -->
         {% with user.profile.rol as rol %}
             
+            {% if rol == "Administrador" or rol == "Entrenador" %}
+                
+                <h4 class="mt-3 text-info">Gestión de Turnos (Staff)</h4>
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="{% url 'turnos:staff_list' %}" class="btn btn-outline-info">Ver Todos los Turnos</a>
+                    <a href="{% url 'turnos:staff_create' %}" class="btn btn-outline-info">Crear Nuevo Cupo/Asignar</a>
+                </div>
+
+            {% endif %}
+
             {% if rol == "Administrador" %}
                 <h4 class="mt-3 text-warning">Tareas de Administración</h4>
                 <div class="d-flex flex-wrap gap-2">
                     <a href="{% url 'gestion_usuarios' %}" class="btn btn-outline-warning">Gestión de Usuarios</a>
-                    <!-- Asumimos que estas URLs existen en gestion/urls.py -->
                     <a href="{% url 'gestion_planes' %}" class="btn btn-outline-warning">Gestionar Planes y Precios</a>
                     <a href="{% url 'gestion_membresias' %}" class="btn btn-outline-warning">Gestionar Membresías</a>
                     <a href="{% url 'gestion_clases' %}" class="btn btn-outline-warning">Gestionar Clases</a>
@@ -40,7 +46,14 @@
                 </div>
 
             {% elif rol == "Socio" %}
-                <h4 class="mt-3 text-success">Mi Información</h4>
+                
+                <h4 class="mt-3 text-primary">Gestión de Turnos</h4>
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="{% url 'turnos:disponibles' %}" class="btn btn-outline-primary">Reservar Turno</a>
+                    <a href="{% url 'turnos:mis_reservas' %}" class="btn btn-outline-primary">Mis Turnos Reservados</a>
+                </div>
+
+                <h4 class="mt-4 text-success">Mi Información</h4>
                 <div class="d-flex flex-wrap gap-2">
                     <a href="{% url 'mi_plan' %}" class="btn btn-outline-success">Mi Plan/Membresía</a>
                     <a href="{% url 'mi_rutina' %}" class="btn btn-outline-success">Mi Rutina</a>
