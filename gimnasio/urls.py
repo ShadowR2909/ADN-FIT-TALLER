@@ -8,6 +8,6 @@ urlpatterns = [
     path ('', include ('cuentas.urls')),    #Vistas de autenticacion y perfil
     path('', include('gestion.urls')),      #vistas de gestion de negocio
     path('accounts/', include('django.contrib.auth.urls')), 
-
+    path('turnos/', include('turnos.urls')), #vistas de turnos
     
 ]

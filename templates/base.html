@@ -36,6 +36,28 @@
                         
                         {% with user.profile.rol as rol %}
                         
+                        {# ----------------------------------------------------------------- #}
+                        {#                     CÓDIGO DE TURNOS CORREGIDO                      #}
+                        {# ----------------------------------------------------------------- #}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="turnosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Turnos
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="turnosDropdown">
+                                {% if rol == "Socio" %}
+                                    <li><a class="dropdown-item" href="{% url 'turnos:mis_reservas' %}">Mis Reservas</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'turnos:disponibles' %}">Reservar Turno</a></li>
+                                {% endif %}
+
+                                {% if rol == "Entrenador" or rol == "Administrador" or user.is_superuser %}
+                                    <li><a class="dropdown-item" href="{% url 'turnos:staff_list' %}">Gestión de Turnos</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'turnos:staff_create' %}">Crear Cupo</a></li>
+                                {% endif %}
+                            </ul>
+                        </li>
+                        {# ----------------------------------------------------------------- #}
+
+
                         {% if rol == "Socio" %}
                             <li class="nav-item"><a class="nav-link" href="{% url 'mis_clases' %}">Clases</a></li>
                             <li class="nav-item"><a class="nav-link" href="{% url 'mi_membresia' %}">Mi Membresía</a></li>

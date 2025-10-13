@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    
+    <h2>Mis Turnos Reservados</h2>
+    
+    {% include "includes/messages.html" %} {# Asegúrate de que esta ruta sea correcta: incluye/mensajes.html o includes/messages.html #}
+
+    {# AQUÍ ESTABA EL ERROR: Referencia a 'turno_create'. Cambiamos a 'turnos:disponibles' #}
+    <div class="mb-3">
+        <a href="{% url 'turnos:disponibles' %}" class="btn btn-primary">Reservar Nuevo Turno</a>
+    </div>
+
+    {% if mis_reservas %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Fecha y Hora</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for turno in mis_reservas %}
+            <tr>
+                <td>{{ turno.fecha_hora_inicio|date:"d M Y" }} a las {{ turno.fecha_hora_inicio|time:"H:i" }}</td>
+                <td>
+                    {% if turno.estado == 'CONFIRMADO' %}
+                        <span class="badge bg-success">{{ turno.estado }}</span>
+                    {% elif turno.estado == 'PENDIENTE' %}
+                        <span class="badge bg-warning text-dark">{{ turno.estado }}</span>
+                    {% elif turno.estado == 'CANCELADO' %}
+                        <span class="badge bg-danger">{{ turno.estado }}</span>
+                    {% else %}
+                        <span class="badge bg-secondary">{{ turno.estado }}</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if turno.estado == 'CONFIRMADO' %}
+                        {# Formulario para cancelar usando POST #}
+                        <form method="post" action="{% url 'turnos:cancelar' turno.pk %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-danger" 
+                                onclick="return confirm('¿Estás seguro de que quieres cancelar este turno?');">
+                                Cancelar
+                            </button>
+                        </form>
+                    {% else %}
+                        <span class="text-muted">No editable</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="alert alert-info">Aún no tienes ninguna reserva activa. <a href="{% url 'turnos:disponibles' %}">¡Reserva un turno ahora!</a></p>
+    {% endif %}
+
+</div>
+{% endblock content %}

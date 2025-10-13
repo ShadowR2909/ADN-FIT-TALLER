@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    
+    {% if object %}
+        <h2>Editar Turno</h2>
+    {% else %}
+        <h2>Reservar Nuevo Turno</h2>
+    {% endif %}
+
+    <p class="text-muted">Selecciona la fecha y hora. La disponibilidad máxima es de 50 cupos diarios.</p>
+    
+    {% comment %} Muestra mensajes de error (incluidos los de cupo lleno) {% endcomment %}
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+
+        {# Campos no de formulario (errores generales) #}
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="mb-3">
+            <label for="{{ form.fecha_hora_inicio.id_for_label }}" class="form-label">
+                {{ form.fecha_hora_inicio.label }}
+            </label>
+            {{ form.fecha_hora_inicio }}
+            
+            {% if form.fecha_hora_inicio.errors %}
+                {% for error in form.fecha_hora_inicio.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-success">Guardar Turno</button>
+        <a href="{% url 'turno_list' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+    
+</div>
+{% endblock content %}

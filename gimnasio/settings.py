@@ -39,13 +39,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # Local apps
-    'cuentas.apps.CuentasConfig',   #App de usuario y Perfiles
-    'gestion',                      #App de Planes, Membresias, Rutinas, etc
+    'cuentas.apps.CuentasConfig',    # App de usuario y Perfiles
+    'gestion',                       # App de Planes, Membresias, Rutinas, etc (Ajustar si esta app debe estar aquí)
+    'turnos',                        # App para gestionar turnos
 ]
 
 LOGIN_URL = 'login' 
-LOGIN_REDIRECT_URL = 'dashboard'   # a dónde enviar luego de login
-LOGOUT_REDIRECT_URL = 'login'      # a dónde enviar luego de logout
+LOGIN_REDIRECT_URL = 'dashboard'  # a dónde enviar luego de login
+LOGOUT_REDIRECT_URL = 'login'     # a dónde enviar luego de logout
 
 
 MIDDLEWARE = [
@@ -58,11 +59,19 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# -------------------------------------------------------------
+# CORRECCIÓN CLAVE: Asegura que el nombre de tu modelo sea EXACTO.
+# Si tu modelo de usuario personalizado en cuentas/models.py se llama 
+# 'CustomUser', la línea debe ser: 'cuentas.CustomUser'
+# Si se llama 'Socio', debe ser: 'cuentas.Socio'
+# Dejamos 'cuentas.User' asumiendo que ese es el nombre de tu modelo.
+AUTH_USER_MODEL = 'auth.User'
+# -------------------------------------------------------------
+
 ROOT_URLCONF = 'gimnasio.urls'
 
 TEMPLATES = [
     {
-             
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
@@ -88,11 +97,11 @@ WSGI_APPLICATION = 'gimnasio.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',  # Nombre de la base, en Supabase suele ser 'postgres'
-        'USER': 'postgres.dfplifenjfhgdamtfukb',  # Usuario de la DB (en Supabase suele empezar con 'postgres')
-        'PASSWORD': 'root',  # La contraseña que te da Supabase
-        'HOST': 'aws-1-us-east-2.pooler.supabase.com',  # Host de Supabase (copialo del panel)
-        'PORT': '6543',  # Puerto de PostgreSQL
+        'NAME': 'postgres',
+        'USER': 'postgres.dfplifenjfhgdamtfukb',
+        'PASSWORD': 'root',
+        'HOST': 'aws-1-us-east-2.pooler.supabase.com', 
+        'PORT': '6543',
     }
 }
 
@@ -119,9 +128,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es-ar' # Cambiado a español Argentina, común en desarrollo local.
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Argentina/Buenos_Aires' # Cambiado a TZ de Argentina
 
 USE_I18N = True
 
