@@ -70,3 +70,38 @@ class ReporteFaltante(models.Model):
 
     def __str__(self):
         return f"Reporte #{self.id} de {self.accesorio.nombre} - {self.estado}"
+
+class Reposicion(models.Model):
+    """Registra la compra o reposición de stock en respuesta a un ReporteFaltante confirmado."""
+    
+    # Vinculamos al reporte que generó la necesidad
+    reporte = models.OneToOneField(
+        ReporteFaltante, 
+        on_delete=models.CASCADE,
+        limit_choices_to={'estado': 'CONFIRMADO'}, # Solo se puede reponer un reporte confirmado
+        related_name='reposicion'
+    )
+    
+    # Cantidad que se compró (debería ser igual o mayor a la faltante)
+    cantidad_comprada = models.PositiveIntegerField(
+        default=0,
+        verbose_name="Cantidad de unidades compradas"
+    )
+    
+    fecha_compra = models.DateTimeField(auto_now_add=True)
+    
+    # El Administrador que procesó la compra
+    administrador = models.ForeignKey(
+        User, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        related_name='compras_procesadas'
+    )
+    
+    def __str__(self):
+        return f'Reposición de {self.cantidad_comprada} de {self.reporte.accesorio.nombre}'
+
+    class Meta:
+        verbose_name = "Reposición de Stock"
+        verbose_name_plural = "Reposiciones de Stock"
+        ordering = ['-fecha_compra']

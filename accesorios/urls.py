@@ -13,4 +13,7 @@ urlpatterns = [
     # Proceso de confirmación (Empleados/Admin)
     path('reportes/', views.reportes_pendientes_list, name='reportes_pendientes'),
     path('reportes/confirmar/<int:pk>/', views.reporte_confirmar, name='reporte_confirmar'),
+
+    path('reposicion/crear/<int:pk>/', views.reposicion_create, name='reposicion_create'), 
+
 ]

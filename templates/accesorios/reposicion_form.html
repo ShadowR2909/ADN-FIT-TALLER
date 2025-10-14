@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}Reposición de Stock{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Procesar Reposición de Stock</h1>
+    <a href="{% url 'accesorios:reportes_pendientes' %}" class="btn btn-secondary">
+        Volver a Reportes
+    </a>
+</div>
+
+<div class="form-container-card">
+    <h3 class="text-accent mb-4">Artículo a Reponer: {{ reporte.accesorio.nombre }}</h3>
+
+    <div class="alert alert-info">
+        <p>Reporte ID: **{{ reporte.pk }}**</p>
+        <p>Cantidad Faltante Reportada: **{{ reporte.cantidad_faltante }}** unidades.</p>
+        <p>Cantidad actual en inventario: **{{ reporte.accesorio.cantidad_total }}** unidades.</p>
+        <p class="mt-2">Utilice el formulario de abajo para registrar la cantidad comprada y actualizar el inventario.</p>
+    </div>
+
+    <form method="post" class="needs-validation" novalidate>
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label for="{{ form.cantidad_comprada.id_for_label }}" class="form-label fw-bold">
+                {{ form.cantidad_comprada.label }}
+            </label>
+            
+            {# Renderiza el input con la clase CSS de Bootstrap #}
+            {% render_field form.cantidad_comprada class+="form-control form-control-lg" %}
+            
+            {% for error in form.cantidad_comprada.errors %}
+                <div class="errorlist">{{ error }}</div>
+            {% endfor %}
+            <div class="form-text">Debe ingresar al menos 1 unidad.</div>
+        </div>
+
+        <hr class="my-4">
+
+        <button type="submit" class="btn btn-adn-edit btn-lg me-2">
+            <i class="fas fa-plus-circle me-1"></i> Confirmar Compra y Añadir Stock
+        </button>
+        <a href="{% url 'accesorios:reportes_pendientes' %}" class="btn btn-secondary btn-lg">
+            Cancelar
+        </a>
+    </form>
+</div>
+{% endblock content %}

@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Accesorio, ReporteFaltante
-from .forms import ReporteFaltanteForm
+from .models import Accesorio, ReporteFaltante, Reposicion
+from .forms import ReporteFaltanteForm, ReposicionForm
 from django.utils import timezone
 
 # Importar lógica de roles si la tienes, por ahora solo requerimos staff
@@ -76,3 +76,61 @@ def reporte_confirmar(request, pk):
 
     # Para GET, simplemente redirigimos o mostramos una página simple
     return redirect('accesorios:reportes_pendientes')
+
+# 4. GESTIÓN DE REPOSICIÓN (Flujo de Compra/Actualización de Stock)
+class AdminRequiredMixin(UserPassesTestMixin):
+    """Mixin que solo permite el acceso a usuarios con rol 'Administrador'."""
+    def test_func(self):
+        return self.request.user.is_authenticated and self.request.user.profile.rol == 'Administrador'
+
+@login_required
+def reposicion_create(request, pk):
+    """
+    Permite al Administrador procesar la compra de un Reporte CONFIRMADO,
+    actualizando el stock del Accesorio.
+    """
+    reporte = get_object_or_404(ReporteFaltante, pk=pk, estado='CONFIRMADO')
+    
+    # Simple check de rol, aunque la URL solo estará visible para Admin
+    if not request.user.profile.rol == 'Administrador':
+        messages.error(request, "Permiso denegado: solo Administradores pueden reponer stock.")
+        return redirect('accesorios:reportes_pendientes')
+    
+    # Si el reporte ya tiene una reposición asociada, no se puede volver a reponer
+    if hasattr(reporte, 'reposicion'):
+        messages.warning(request, "Este reporte ya fue procesado y el stock fue actualizado.")
+        return redirect('accesorios:reportes_pendientes')
+
+    if request.method == 'POST':
+        form = ReposicionForm(request.POST)
+        if form.is_valid():
+            cantidad_comprada = form.cleaned_data['cantidad_comprada']
+            
+            # 1. Crear el objeto Reposicion
+            reposicion = Reposicion.objects.create(
+                reporte=reporte,
+                cantidad_comprada=cantidad_comprada,
+                administrador=request.user
+            )
+            
+            # 2. Actualizar la cantidad total del Accesorio
+            accesorio = reporte.accesorio
+            accesorio.cantidad_total += cantidad_comprada
+            accesorio.save()
+            
+            # 3. Marcar el reporte como CERRADO (o un estado final, para no reaparecer)
+            reporte.estado = 'CERRADO'
+            reporte.save()
+            
+            messages.success(request, f'¡Stock de {accesorio.nombre} actualizado! Se agregaron {cantidad_comprada} unidades.')
+            return redirect('accesorios:reportes_pendientes')
+    else:
+        # Pre-llenar el formulario con la cantidad faltante reportada
+        form = ReposicionForm(initial={'cantidad_comprada': reporte.cantidad_faltante})
+
+    context = {
+        'form': form,
+        'reporte': reporte,
+        'page_title': 'Procesar Reposición de Stock'
+    }
+    return render(request, 'accesorios/reposicion_form.html', context)

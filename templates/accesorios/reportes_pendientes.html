@@ -50,10 +50,11 @@
                 </td>
                 <td class="text-center">
                     {% if reporte.estado == 'PENDIENTE' %}
+                        {# Botones de Confirmar/Descartar (Para Empleados/Staff) #}
                         <form method="post" action="{% url 'accesorios:reporte_confirmar' reporte.pk %}" class="d-inline">
                             {% csrf_token %}
                             <input type="hidden" name="accion" value="confirmar">
-                            <button type="submit" class="btn btn-adn-edit me-2" 
+                            <button type="submit" class="btn btn-adn-edit me-2 btn-sm" 
                                     onclick="return confirm('¿Confirma que este accesorio falta y debe ser comprado?');">
                                 Confirmar Faltante
                             </button>
@@ -61,15 +62,23 @@
                         <form method="post" action="{% url 'accesorios:reporte_confirmar' reporte.pk %}" class="d-inline">
                             {% csrf_token %}
                             <input type="hidden" name="accion" value="descartar">
-                            <button type="submit" class="btn btn-cancelar" 
+                            <button type="submit" class="btn btn-cancelar btn-sm" 
                                     onclick="return confirm('¿Desea descartar este reporte?');">
                                 Descartar
                             </button>
                         </form>
+                    
+                    {% elif reporte.estado == 'CONFIRMADO' and user.profile.rol == 'Administrador' %}
+                        {# NUEVO: Botón de Reposición (Solo para Administrador) #}
+                        <a href="{% url 'accesorios:reposicion_create' reporte.pk %}" class="btn btn-primary btn-sm">
+                            Procesar Compra ({{ reporte.cantidad_faltante }} u.)
+                        </a>
+
                     {% else %}
-                        <span class="tag-estado {{ reporte.estado|lower }}">
-                            {{ reporte.get_estado_display }}
-                        </span>
+                        {# Muestra estado final (DESCARTADO o CERRADO) #}
+                        <span class="tag-estado {{ reporte.estado|lower }}">{{ reporte.get_estado_display }}</span>
+                        {% if reporte.estado == 'CERRADO' %}<br><small>Stock Repuesto</small>{% endif %}
+
                     {% endif %}
                 </td>
             </tr>
