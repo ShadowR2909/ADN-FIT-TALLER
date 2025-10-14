@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Inventario de Accesorios{% endblock %}
+
+{# Usamos 'gestion-container' por defecto de base.html #}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Inventario de Accesorios</h1>
+    {# Botón para ir a crear un reporte faltante #}
+    <a href="{% url 'accesorios:reporte_faltante_create' %}" class="btn btn-primary">
+        Reportar Faltante
+    </a>
+</div>
+
+{# Mensajes de Django (si los hay) #}
+{% if messages %}
+    <div class="alert-container">
+        {% for message in messages %}
+            <div class="alert alert-adn-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<div class="table-responsive">
+    <table class="table table-hover align-middle">
+        <thead>
+            <tr>
+                <th scope="col">Accesorio</th>
+                <th scope="col">Descripción</th>
+                <th scope="col" class="text-center">Cantidad Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for accesorio in accesorios %}
+            <tr>
+                <td class="fw-bold">{{ accesorio.nombre }}</td>
+                <td>
+                    {% if accesorio.descripcion %}
+                        {{ accesorio.descripcion|truncatechars:70 }}
+                    {% else %}
+                        <span class="text-muted">Sin descripción.</span>
+                    {% endif %}
+                </td>
+                <td class="text-center">
+                    {# Usamos un color para resaltar la cantidad #}
+                    <span class="badge bg-success py-2 px-3 fs-6">{{ accesorio.cantidad_total }}</span>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3" class="text-center text-muted py-4">
+                    No hay accesorios registrados en el inventario.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{# Botón para ir a ver reportes pendientes (Solo para Staff/Admin) #}
+{% if user.profile.rol == "Entrenador" or user.profile.rol == "Administrador" %}
+<div class="mt-4">
+    <a href="{% url 'accesorios:reportes_pendientes' %}" class="btn btn-secondary">
+        Ver Reportes Pendientes de Confirmación
+    </a>
+</div>
+{% endif %}
+
+{% endblock content %}

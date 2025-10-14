@@ -9,9 +9,10 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-
 from pathlib import Path
 import os
+from datetime import timedelta # Necesario si vas a manejar tokens o sesiones limitadas (opcional)
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -28,25 +29,34 @@ DEBUG = True
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 
+# ------------------------------------------------------------------
 # Application definition
+# ------------------------------------------------------------------
 
 INSTALLED_APPS = [
+    # Core Django Apps (Obligatorias)
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
+    # 3rd Party Apps (Funcionalidad extra)
+    'django.contrib.humanize',      
+    'widget_tweaks',                
 
-    # Local apps
-    'cuentas.apps.CuentasConfig',    # App de usuario y Perfiles
-    'gestion',                       # App de Planes, Membresias, Rutinas, etc (Ajustar si esta app debe estar aquí)
-    'turnos',                        # App para gestionar turnos
+    # Local Apps (Tus módulos de proyecto)
+    'cuentas.apps.CuentasConfig',   
+    'gestion',                      
+    'turnos',                       
+    'accesorios',                   
 ]
 
-LOGIN_URL = 'login' 
-LOGIN_REDIRECT_URL = 'dashboard'  # a dónde enviar luego de login
-LOGOUT_REDIRECT_URL = 'login'     # a dónde enviar luego de logout
+# Configuración de URLs de autenticación
+LOGIN_URL = 'login'              # URL para redirigir a usuarios no autenticados
+LOGIN_REDIRECT_URL = 'dashboard' # URL a donde ir después de iniciar sesión con éxito
+LOGOUT_REDIRECT_URL = 'login'    # URL a donde ir después de cerrar sesión
 
 
 MIDDLEWARE = [
@@ -59,30 +69,35 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# -------------------------------------------------------------
-# CORRECCIÓN CLAVE: Asegura que el nombre de tu modelo sea EXACTO.
-# Si tu modelo de usuario personalizado en cuentas/models.py se llama 
-# 'CustomUser', la línea debe ser: 'cuentas.CustomUser'
-# Si se llama 'Socio', debe ser: 'cuentas.Socio'
-# Dejamos 'cuentas.User' asumiendo que ese es el nombre de tu modelo.
-AUTH_USER_MODEL = 'auth.User'
-# -------------------------------------------------------------
+# ------------------------------------------------------------------
+# Configuración de Usuario Personalizado (CRÍTICO)
+# ------------------------------------------------------------------
+
+# IMPORTANTE: Debes cambiar 'auth.User' por el nombre de tu modelo de usuario
+# personalizado si has extendido AbstractUser.
+# Si tu modelo de usuario está en 'cuentas/models.py' y se llama 'CustomUser',
+# debe ser: AUTH_USER_MODEL = 'cuentas.CustomUser'
+# Si estás usando el modelo User por defecto, puedes comentar esta línea.
+# ASUMO que tu modelo se llama 'User' en la app 'cuentas':
+
+# ------------------------------------------------------------------
 
 ROOT_URLCONF = 'gimnasio.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
-        'APP_DIRS': True,
+        # Directorio principal de plantillas (e.g., base.html, login.html)
+        'DIRS': [os.path.join(BASE_DIR, 'templates')], 
+        'APP_DIRS': True, # Busca plantillas dentro de cada app (e.g., turnos/templates/turnos/...)
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-                
-                'cuentas.context_processors.perfil_context',  # Agregado para pasar el perfil a todas las plantillas
+                'django.contrib.auth.context_processors.auth', # Provee el objeto 'user'
+                'django.contrib.messages.context_processors.messages', # Provee los mensajes flash
+
+                'cuentas.context_processors.perfil_context', # Procesador para inyectar el objeto 'profile' en todas las plantillas
             ],
         },
     },
@@ -91,8 +106,9 @@ TEMPLATES = [
 WSGI_APPLICATION = 'gimnasio.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+# ------------------------------------------------------------------
+# Database (PostgreSQL/Supabase)
+# ------------------------------------------------------------------
 
 DATABASES = {
     'default': {
@@ -125,29 +141,32 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/5.2/topics/i18n/
+# ------------------------------------------------------------------
+# Internationalization and Timezone
+# ------------------------------------------------------------------
 
-LANGUAGE_CODE = 'es-ar' # Cambiado a español Argentina, común en desarrollo local.
+LANGUAGE_CODE = 'es-ar' # Español de Argentina
 
-TIME_ZONE = 'America/Argentina/Buenos_Aires' # Cambiado a TZ de Argentina
+TIME_ZONE = 'America/Argentina/Buenos_Aires' # Zona horaria de Buenos Aires (aplica a la mayoría de Argentina)
 
-USE_I18N = True
+USE_I18N = True # Habilitar traducciones (Internacionalización)
 
-USE_TZ = True
+USE_TZ = True # Habilitar soporte para zonas horarias
 
 
+# ------------------------------------------------------------------
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
+# ------------------------------------------------------------------
 
-
-STATIC_URL = 'static/'
+STATIC_URL = 'static/' # Prefijo de URL para servir archivos estáticos
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static")
+    os.path.join(BASE_DIR, "static") # Directorio donde Django busca archivos estáticos en desarrollo
 ]
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
+# Configuración de archivos estáticos para producción (Opcional, pero recomendado para el futuro)
+# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') 
 
+
+# Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

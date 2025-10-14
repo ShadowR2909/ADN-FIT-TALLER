@@ -9,5 +9,6 @@ urlpatterns = [
     path('', include('gestion.urls')),      #vistas de gestion de negocio
     path('accounts/', include('django.contrib.auth.urls')), 
     path('turnos/', include('turnos.urls')), #vistas de turnos
+    path('accesorios/', include('accesorios.urls')), #vistas de accesorios
     
 ]

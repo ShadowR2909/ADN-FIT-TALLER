@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+{% load tz %}
+
+{% block title %}Confirmación de Reportes{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Reportes Pendientes de Confirmación</h1>
+    <a href="{% url 'accesorios:inventario_list' %}" class="btn btn-secondary">
+        Volver a Inventario
+    </a>
+</div>
+
+<p class="text-muted mb-4">
+    Revisa los reportes de accesorios faltantes o dañados. Solo los reportes en estado **PENDIENTE** pueden ser confirmados o descartados.
+</p>
+
+{% if messages %}
+    <div class="alert-container">
+        {% for message in messages %}
+            <div class="alert alert-adn-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<div class="table-responsive">
+    <table class="table table-hover align-middle">
+        <thead>
+            <tr>
+                <th scope="col">Accesorio</th>
+                <th scope="col">Cantidad Faltante</th>
+                <th scope="col">Reportado Por</th>
+                <th scope="col">Fecha Reporte</th>
+                <th scope="col" class="text-center">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reporte in reportes %}
+            <tr class="{% if reporte.estado == 'PENDIENTE' %}table-warning-adn{% endif %}">
+                <td class="fw-bold">{{ reporte.accesorio.nombre }}</td>
+                <td><span class="badge bg-danger fs-6">{{ reporte.cantidad_faltante }}</span> unidades</td>
+                <td>{{ reporte.empleado_reporte.username }}</td>
+                <td>
+                    {{ reporte.fecha_reporte|localtime|date:"d M Y" }} a las {{ reporte.fecha_reporte|localtime|time:"H:i" }}
+                </td>
+                <td class="text-center">
+                    {% if reporte.estado == 'PENDIENTE' %}
+                        <form method="post" action="{% url 'accesorios:reporte_confirmar' reporte.pk %}" class="d-inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="accion" value="confirmar">
+                            <button type="submit" class="btn btn-adn-edit me-2" 
+                                    onclick="return confirm('¿Confirma que este accesorio falta y debe ser comprado?');">
+                                Confirmar Faltante
+                            </button>
+                        </form>
+                        <form method="post" action="{% url 'accesorios:reporte_confirmar' reporte.pk %}" class="d-inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="accion" value="descartar">
+                            <button type="submit" class="btn btn-cancelar" 
+                                    onclick="return confirm('¿Desea descartar este reporte?');">
+                                Descartar
+                            </button>
+                        </form>
+                    {% else %}
+                        <span class="tag-estado {{ reporte.estado|lower }}">
+                            {{ reporte.get_estado_display }}
+                        </span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center text-muted py-4">
+                    No hay reportes pendientes de confirmación. ¡Todo en orden!
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock content %}

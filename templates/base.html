@@ -8,17 +8,16 @@
     
     <link href="{% static 'vendor/css/bootstrap.min.css' %}" rel="stylesheet">
     
-    <link rel="stylesheet" href="{% static 'css/gimnasio.css' %}">
-    
+<link rel="stylesheet" href="{% static 'css/gimnasio.css' %}?v=20251013a">    
     {% block extra_head %}{% endblock %}
 </head>
 <body {% if auth_page %}class="auth-page"{% endif %}>
     
     {% if user.is_authenticated and not auth_page %}
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top"> 
+        <nav class="navbar navbar-expand-lg navbar-dark sticky-top navbar-adnfit"> 
             <div class="container-fluid">
                 
-                <a class="navbar-brand text-success fw-bold" href="{% url 'dashboard' %}">
+                <a class="navbar-brand text-accent fw-bold logo-brand" href="{% url 'dashboard' %}">
                     <img src="{% static 'img/logo-gym.png' %}" alt="Logo Gimnasio" width="30" height="30" class="d-inline-block align-text-top me-2">
                     ADN-FIT
                 </a>
@@ -36,37 +35,48 @@
                         
                         {% with user.profile.rol as rol %}
                         
-                        {# ----------------------------------------------------------------- #}
-                        {#                     CÓDIGO DE TURNOS CORREGIDO                      #}
-                        {# ----------------------------------------------------------------- #}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="turnosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Turnos
                             </a>
-                            <ul class="dropdown-menu" aria-labelledby="turnosDropdown">
+                            <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="turnosDropdown">
                                 {% if rol == "Socio" %}
                                     <li><a class="dropdown-item" href="{% url 'turnos:mis_reservas' %}">Mis Reservas</a></li>
                                     <li><a class="dropdown-item" href="{% url 'turnos:disponibles' %}">Reservar Turno</a></li>
                                 {% endif %}
 
                                 {% if rol == "Entrenador" or rol == "Administrador" or user.is_superuser %}
+                                    <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item" href="{% url 'turnos:staff_list' %}">Gestión de Turnos</a></li>
                                     <li><a class="dropdown-item" href="{% url 'turnos:staff_create' %}">Crear Cupo</a></li>
                                 {% endif %}
                             </ul>
                         </li>
-                        {# ----------------------------------------------------------------- #}
 
 
                         {% if rol == "Socio" %}
                             <li class="nav-item"><a class="nav-link" href="{% url 'mis_clases' %}">Clases</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{% url 'mi_membresia' %}">Mi Membresía</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{% url 'mi_rutina' %}">Mi Rutina</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'mi_membresia' %}">Membresía</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'mi_rutina' %}">Rutina</a></li>
                         {% endif %}
                         
                         {% if rol == "Entrenador" or rol == "Administrador" %}
                             <li class="nav-item"><a class="nav-link" href="{% url 'asignar_rutinas' %}">Asignar Rutinas</a></li>
                             <li class="nav-item"><a class="nav-link" href="{% url 'gestion_clases' %}">Gestión Clases</a></li>
+                        
+                            {# --- NUEVO: GESTIÓN DE ACCESORIOS (Para Empleados/Staff) --- #}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="accesoriosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Accesorios
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="accesoriosDropdown">
+                                    <li><a class="dropdown-item" href="{% url 'accesorios:inventario_list' %}">Consultar Inventario</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'accesorios:reporte_faltante_create' %}">Reportar Faltante</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="{% url 'accesorios:reportes_pendientes' %}">Confirmar Reportes</a></li>
+                                </ul>
+                            </li>
+                        
                         {% endif %}
                         
                         {% if rol == "Administrador" %}
@@ -81,12 +91,12 @@
 
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                         <li class="nav-item me-2">
-                            <a class="btn btn-outline-info" href="{% url 'editar_perfil' %}">Mi Perfil ({{ user.username }})</a>
+                            <a class="btn btn-outline-accent" href="{% url 'editar_perfil' %}">Mi Perfil ({{ user.username }})</a>
                         </li>
                         <li class="nav-item"> 
                             <form method="post" action="{% url 'logout' %}">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-danger">Cerrar Sesión</button>
+                                <button type="submit" class="btn btn-adn-danger">Cerrar Sesión</button>
                             </form>
                         </li>
                     </ul>
@@ -100,18 +110,28 @@
         {% if messages and not auth_page %}
             <div class="container mt-4">
                 {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    <div class="alert alert-adn-{{ message.tags }} alert-dismissible fade show" role="alert">
                         {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 {% endfor %}
             </div>
         {% endif %}
 
+        {# --- LÓGICA CORREGIDA PARA EL CONTENEDOR PRINCIPAL --- #}
+        {# Si es página de autenticación, inyectamos el contenido directamente en el body para centrarlo #}
+        {% if not auth_page %}
         <div class="{% block content_wrapper_class %}gestion-container{% endblock %}">
+        {% endif %}
+
             {% block content %}
             {% endblock %}
+
+        {% if not auth_page %}
         </div>
+        {% endif %}
+        {# --- FIN LÓGICA CORREGIDA --- #}
+
     </div>
 
     <script src="{% static 'vendor/js/bootstrap.bundle.min.js' %}"></script>

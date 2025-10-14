@@ -1,0 +1,29 @@
+[
+  {
+    "model": "accesorios.accesorio",
+    "pk": 1,
+    "fields": {
+      "nombre": "Mancuernas 5kg",
+      "cantidad_total": 20,
+      "descripcion": "Juego de mancuernas de peso estándar para entrenamiento básico."
+    }
+  },
+  {
+    "model": "accesorios.accesorio",
+    "pk": 2,
+    "fields": {
+      "nombre": "Colchonetas de Yoga",
+      "cantidad_total": 45,
+      "descripcion": "Colchonetas de 10mm para ejercicios en suelo y estiramiento."
+    }
+  },
+  {
+    "model": "accesorios.accesorio",
+    "pk": 3,
+    "fields": {
+      "nombre": "Bandas de Resistencia",
+      "cantidad_total": 12,
+      "descripcion": "Bandas de látex de resistencia media (color rojo)."
+    }
+  }
+]
