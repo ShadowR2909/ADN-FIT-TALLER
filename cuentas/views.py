@@ -161,40 +161,46 @@ def lista_alumnos(request):
 @user_passes_test(es_administrador)
 @transaction.atomic
 def editar_usuario_view(request, user_id):
-    """Permite al Administrador editar un usuario (incluyendo el rol)."""
+    """Permite al Administrador editar un usuario (incluyendo el rol y estado activo)."""
     usuario_a_editar = get_object_or_404(User, id=user_id)
     profile = get_object_or_404(Profile, user=usuario_a_editar)
-    
+
     if request.method == 'POST':
-        # 🚨 USAMOS AdminProfileForm: Este formulario SÍ incluye el campo 'rol'. 🚨
-        profile_form = AdminProfileForm(request.POST, instance=profile) 
-        
-        # --- Lógica para el estado is_active (campo del modelo User) ---
-        is_active_new_status = request.POST.get('is_active')
-        usuario_a_editar.is_active = (is_active_new_status == 'on') 
-        # ----------------------------------------
-        
+        profile_form = AdminProfileForm(request.POST, instance=profile)
+
         if profile_form.is_valid():
+            # Guardamos primero el Profile
             profile_form.save()
-            
-            # Guardamos el estado activo/inactivo en el objeto User
-            usuario_a_editar.save() 
-            
-            messages.success(request, f"Usuario '{usuario_a_editar.username}' actualizado exitosamente. Estado Activo: {usuario_a_editar.is_active}")
-            return redirect('cuentas:gestion_usuarios')
+
+            # Guardamos campos del User
+            usuario_a_editar.username = request.POST.get('username', usuario_a_editar.username)
+            usuario_a_editar.first_name = request.POST.get('first_name', usuario_a_editar.first_name)
+            usuario_a_editar.last_name = request.POST.get('last_name', usuario_a_editar.last_name)
+            usuario_a_editar.email = request.POST.get('email', usuario_a_editar.email)
+
+            # Guardar estado activo
+            is_active_new_status = request.POST.get('is_active')
+            usuario_a_editar.is_active = (is_active_new_status == 'on')
+
+            usuario_a_editar.save()  # Guardamos cambios en User
+
+            messages.success(request, f"Usuario '{usuario_a_editar.username}' actualizado exitosamente.")
+            return redirect('gestion_usuarios')  # sin namespace
+
         else:
             messages.error(request, "Error al actualizar el usuario. Revisa el formulario.")
+
     else:
-        # Inicializamos con AdminProfileForm para mostrar el campo 'rol'
         profile_form = AdminProfileForm(instance=profile)
-        
+
     context = {
         'usuario_a_editar': usuario_a_editar,
         'profile_form': profile_form,
         'titulo': f'Editar Usuario: {usuario_a_editar.username}'
     }
-    
+
     return render(request, 'cuentas/editar_usuario.html', context)
+
     
 
 @login_required
