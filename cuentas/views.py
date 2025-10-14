@@ -153,9 +153,10 @@ def gestion_usuarios(request):
 @login_required
 @user_passes_test(es_entrenador)
 def lista_alumnos(request):
-    """Muestra solo usuarios con rol 'Socio'."""
-    socios = User.objects.filter(profile__rol='Socio').order_by('last_name')
+    """Muestra solo usuarios con rol 'socio'."""
+    socios = User.objects.filter(profile__rol__iexact='socio').order_by('last_name', 'first_name')
     return render(request, 'cuentas/lista_alumnos.html', {'socios': socios})
+
 
 @login_required
 @user_passes_test(es_administrador)
