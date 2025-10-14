@@ -15,6 +15,21 @@ class StaffRequiredMixin(UserPassesTestMixin):
         return self.request.user.is_authenticated and (
             self.request.user.profile.rol in ['Entrenador', 'Administrador']
         )
+# NUEVO: Historial completo de accesorios (reportes y reposiciones)
+@login_required
+def historial_accesorios(request):
+    """Muestra todos los reportes y reposiciones, con quién y cuándo se realizaron."""
+    reportes = ReporteFaltante.objects.all().select_related('accesorio', 'empleado_reporte', 'empleado_confirmacion')
+    reposiciones = Reposicion.objects.all().select_related('reporte', 'administrador')
+    
+    context = {
+        'reportes': reportes,
+        'reposiciones': reposiciones,
+        'page_title': 'Historial de Accesorios',
+    }
+    return render(request, 'accesorios/historial_accesorios.html', context)
+
+
 
 # 1. CONSULTA Y COMPARA ACCESORIOS (Listar Inventario)
 @login_required
@@ -55,27 +70,33 @@ def reporte_confirmar(request, pk):
     """Permite a un empleado/admin confirmar o descartar un reporte."""
     reporte = get_object_or_404(ReporteFaltante, pk=pk)
 
-    # Opcional: Agregar aquí un chequeo de rol Staff para seguridad
-
     if request.method == 'POST':
         accion = request.POST.get('accion')
 
         if accion == 'confirmar':
             reporte.estado = 'CONFIRMADO'
-            # Aquí podrías reducir la cantidad_total del Accesorio si lo deseas
-            messages.success(request, f'Reporte de {reporte.accesorio.nombre} confirmado. ¡Necesitas comprar!')
+            # Descontamos del stock del accesorio
+            accesorio = reporte.accesorio
+            if accesorio.cantidad_total >= reporte.cantidad_faltante:
+                accesorio.cantidad_total -= reporte.cantidad_faltante
+            else:
+                accesorio.cantidad_total = 0  # Por si la cantidad faltante es mayor
+            accesorio.save()
+
+            messages.success(request, f'Reporte de {accesorio.nombre} confirmado. Stock actualizado.')
 
         elif accion == 'descartar':
             reporte.estado = 'DESCARTADO'
             messages.warning(request, f'Reporte de {reporte.accesorio.nombre} descartado.')
 
         reporte.empleado_confirmacion = request.user
-        reporte.fecha_confirmacion = timezone.now() # Asegura que timezone esté importado
+        reporte.fecha_confirmacion = timezone.now()
         reporte.save()
         return redirect('accesorios:reportes_pendientes')
 
-    # Para GET, simplemente redirigimos o mostramos una página simple
     return redirect('accesorios:reportes_pendientes')
+
+
 
 # 4. GESTIÓN DE REPOSICIÓN (Flujo de Compra/Actualización de Stock)
 class AdminRequiredMixin(UserPassesTestMixin):
@@ -134,3 +155,7 @@ def reposicion_create(request, pk):
         'page_title': 'Procesar Reposición de Stock'
     }
     return render(request, 'accesorios/reposicion_form.html', context)
+
+    
+
+    

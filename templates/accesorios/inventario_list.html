@@ -3,18 +3,19 @@
 
 {% block title %}Inventario de Accesorios{% endblock %}
 
-{# Usamos 'gestion-container' por defecto de base.html #}
-
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Inventario de Accesorios</h1>
-    {# Botón para ir a crear un reporte faltante #}
-    <a href="{% url 'accesorios:reporte_faltante_create' %}" class="btn btn-primary">
-        Reportar Faltante
-    </a>
+    <div>
+        <a href="{% url 'accesorios:reporte_faltante_create' %}" class="btn btn-primary">
+            Reportar Faltante
+        </a>
+        <a href="{% url 'accesorios:historial_accesorios' %}" class="btn btn-secondary ms-2">
+            Ver Historial
+        </a>
+    </div>
 </div>
 
-{# Mensajes de Django (si los hay) #}
 {% if messages %}
     <div class="alert-container">
         {% for message in messages %}
@@ -47,7 +48,6 @@
                     {% endif %}
                 </td>
                 <td class="text-center">
-                    {# Usamos un color para resaltar la cantidad #}
                     <span class="badge bg-success py-2 px-3 fs-6">{{ accesorio.cantidad_total }}</span>
                 </td>
             </tr>
@@ -62,7 +62,6 @@
     </table>
 </div>
 
-{# Botón para ir a ver reportes pendientes (Solo para Staff/Admin) #}
 {% if user.profile.rol == "Entrenador" or user.profile.rol == "Administrador" %}
 <div class="mt-4">
     <a href="{% url 'accesorios:reportes_pendientes' %}" class="btn btn-secondary">
