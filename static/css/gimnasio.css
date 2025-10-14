@@ -1,300 +1,415 @@
-/* ------------------------------------------------------------------ */
-/* ADN-FIT CSS - Tema Oscuro: Negro, Blanco y Acentos Verdes          */
-/* ------------------------------------------------------------------ */
+/* static/css/gimnasio.css - Nuevo Diseño */
 
-/* --- VARIABLES DE COLOR --- */
-:root {
-    --color-bg-dark: #0A0A0A;      /* Fondo Principal: Negro Profundo */
-    --color-bg-card: #1C1C1C;      /* Fondo de Tarjetas/Contenedores: Gris Oscuro (principal) */
-    --color-bg-input: #2A2A2A;     /* Fondo de Campos de Formulario: Negro más claro */
-    --color-accent-primary: #00C853; /* Acento Principal: Verde Esmeralda Vibrante */
-    --color-accent-secondary: #76FF03; /* Acento Secundario/Hover: Verde Lima Claro */
-    --color-text-light: #FFFFFF;   /* Texto General Blanco */
-    --color-text-muted: #E0E0E0;   /* Texto secundario/gris claro */
-    --color-danger: #FF1744;       /* Rojo Brillante (Cancelar/Eliminar) */
-    --color-border-subtle: #333333; /* Borde sutil */
-    --color-error-bg: #440A1A;     /* Fondo de error para mensajes en línea (Rojo oscuro) */
-}
-
-/* --- ESTILOS GENERALES Y CUERPO (BODY) --- */
+/* --- ESTILOS GENERALES --- */
 body {
-    background-color: var(--color-bg-dark);
-    font-family: 'Arial', sans-serif; 
-    color: var(--color-text-light);
+    background-color: #000000; /* Fondo negro como el logo */
+    font-family: Arial, sans-serif;
+    color: #f0f0f0; /* Color de texto general claro */
     min-height: 100vh;
     margin: 0;
-    line-height: 1.6;
 }
 
-/* Titulares: Ahora en blanco, con el subrayado en verde */
-h1, h2, h3, h4, h5, h6 {
-    color: var(--color-text-light); /* Títulos en blanco para legibilidad */
-    font-weight: 800;
-    letter-spacing: 1px;
-    margin-bottom: 25px;
-}
-.gestion-container h1, .dashboard-container h1, 
-.gestion-container h2, .dashboard-container h2 {
-    border-bottom: 3px solid var(--color-accent-primary);
-    padding-bottom: 10px;
-}
-
-/* Utilería de Texto */
-.text-accent { color: var(--color-accent-primary) !important; }
-.text-secondary-accent { color: var(--color-accent-secondary) !important; }
-.text-white { color: var(--color-text-light) !important; }
-
-/* ------------------------------------------------------------------ */
-/* --- 1. NAVEGACIÓN (NAVBAR) --- */
-/* ------------------------------------------------------------------ */
-
-.navbar-adnfit {
-    background-color: #121212 !important; 
-    border-bottom: 3px solid var(--color-accent-primary); 
-}
-/* ... (el resto de la navbar es consistente) ... */
-
-
-/* ------------------------------------------------------------------ */
-/* --- 2. VISTAS DE AUTENTICACIÓN (LOGIN/REGISTER) --- */
-/* ------------------------------------------------------------------ */
-
-/* CENTRADO CRÍTICO: Aplica al <body> cuando auth_page es True */
-body.auth-page {
-    /* Forzamos el 100% del espacio visible para que el flexbox funcione */
-    width: 100vw; 
-    height: 100vh; 
-    
+/* 🌟 CORRECCIÓN 🌟 */
+/* Contenedor para el contenido centrado (login, registro) */
+.centered-content-wrapper {
     display: flex;
-    justify-content: center; /* Centrado horizontal */
-    align-items: center; /* Centrado vertical */
-    
-    padding: 20px; 
-    box-sizing: border-box;
-    margin: 0; 
-}
-
-body.auth-page .main-content-wrapper {
-    /* Sobrescribe el 'display: contents;' anterior para asegurar la altura. */
-    width: 100%;
-    height: 100%; /* Toma el 100% de la altura del body (100vh) */
-    display: flex; /* Lo convertimos en flex para que trabaje junto al body */
-    justify-content: center; 
+    justify-content: center;
     align-items: center;
-    padding: 0;
-    margin: 0;
+    min-height: 100vh;
+    width: 100%;
 }
 
-
-.auth-card {
-    background-color: var(--color-bg-card);
-    padding: 40px;
-    border-radius: 15px;
-    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.7);
-    width: auto;
-    max-width: 420px;
-    text-align: center;
-    border: 2px solid var(--color-accent-primary); 
-    /* El centrado lo hace el body, el margen se quita */
-    margin: 0; 
+/* --- DISEÑO DE LOGO --- */
+.auth-card .logo {
+    margin-bottom: 25px; /* Espacio debajo del logo */
 }
 
 .auth-card .logo img {
-    max-width: 150px; 
+    max-width: 70px; /* Un poco más grande para el logo */
     height: auto;
-    margin-bottom: 20px; 
-    filter: drop-shadow(0 0 15px rgba(0, 200, 83, 0.7)); 
+    box-shadow: 0 5px 15px rgba(48, 227, 51, 0.4); /* Sombra con el color del logo */
+}
+
+/* --- Estilos básicos para la navegación (navbar) --- */
+nav {
+    background-color: #333; /* Fondo oscuro para la barra */
+    padding: 10px 20px;
+}
+
+nav ul {
+    list-style: none; /* Quitar las viñetas */
+    padding: 0;
+    margin: 0;
+    display: flex; /* Mostrar los elementos en una línea */
+    justify-content: flex-end; /* Alinear los elementos a la derecha (opcional) */
+    align-items: center;
+}
+
+nav ul li {
+    margin-left: 20px; /* Espacio entre los elementos del menú */
+}
+
+nav ul li a {
+    color: white; /* Texto blanco para los enlaces */
+    text-decoration: none; /* Quitar el subrayado */
+    padding: 8px 12px;
+    display: block;
+}
+
+nav ul li a:hover {
+    background-color: #575757; /* Cambio de color al pasar el ratón */
+    border-radius: 4px;
+}
+
+/* Opcional: Alinear el logo y título en el header */
+header {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    border-bottom: 1px solid #ccc;
+}
+
+header h1 {
+    margin-left: 15px;
+}
+
+/* --- TARJETA DE AUTENTICACIÓN --- */
+.auth-card {
+    background-color: #1a1a1a; /* Un gris muy oscuro para la tarjeta */
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5); /* Sombra más pronunciada */
+    width: 100%;
+    max-width: 450px;
+    text-align: center;
+    border: 1px solid #30e333; /* Borde sutil del color del logo */
 }
 
 .auth-card h2 {
-    color: var(--color-accent-primary);
-    text-shadow: 0 0 10px rgba(0, 200, 83, 0.6);
+    color: #30e333; /* Título en el color del logo */
+    margin-bottom: 30px;
     font-size: 2.2em;
-    font-weight: 900;
-    margin-bottom: 20px; 
-}
-
-/* ------------------------------------------------------------------ */
-/* --- 3. ESTILOS DE FORMULARIO (GENERAL) y PERFIL --- */
-/* ------------------------------------------------------------------ */
-
-/* INPUTS, SELECTS, TEXTAREAS */
-.form-control, .form-select { 
-    background-color: var(--color-bg-input) !important; /* Fondo oscuro */
-    color: var(--color-text-light) !important;
-    border: 1px solid var(--color-border-subtle);
-    padding: 8px 15px; 
-    font-size: 1.05em; 
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    text-align: left !important;
-    /* Corrección importante para inputs de perfil */
-    opacity: 1; 
-}
-
-.form-control:focus, .form-select:focus {
-    border-color: var(--color-accent-secondary) !important; 
-    box-shadow: 0 0 8px rgba(118, 255, 3, 0.7) !important; 
-}
-
-/* Mensaje de error de campo obligatorio (Rojo sobre fondo oscuro) */
-.errorlist {
-    list-style: none;
-    padding: 5px 10px;
-    margin-top: 5px;
-    margin-bottom: 10px;
-    background-color: var(--color-error-bg);
-    color: var(--color-text-light);
-    border-radius: 5px;
-    font-weight: bold;
-    font-size: 0.9em;
-}
-
-.form-container-card {
-    background-color: var(--color-bg-card); 
-    padding: 25px;
-    border-radius: 10px;
-    border: 1px solid var(--color-border-subtle);
-    margin-top: 20px;
-}
-
-/* ------------------------------------------------------------------ */
-/* --- 4. ESTILOS DE BOTONES (GENERAL) --- */
-/* ------------------------------------------------------------------ */
-
-/* Botón Principal (Verde para Entrar, Guardar, Reservar, Crear Cupo) */
-.btn-primary, .btn-success {
-    background-color: var(--color-accent-primary) !important;
-    border-color: var(--color-accent-primary) !important;
-    color: var(--color-bg-dark) !important; 
-    font-weight: bold;
-    font-size: 1.2em; 
-    padding: 10px 20px;
-    transition: all 0.3s ease;
-}
-
-.btn-primary:hover, .btn-success:hover {
-    background-color: var(--color-accent-secondary) !important; 
-    border-color: var(--color-accent-secondary) !important;
-    transform: translateY(-2px); 
-    box-shadow: 0 6px 15px rgba(118, 255, 3, 0.5);
-}
-
-/* Botón Secundario (Volver/Cancelar en formularios) */
-.btn-secondary {
-    background-color: #555555 !important;
-    border-color: #555555 !important;
-    color: var(--color-text-light) !important;
-    font-weight: 600;
-    padding: 10px 20px;
-}
-/* Botón de edición en tablas (Verde/Acento) */
-.btn-adn-edit { 
-    background-color: var(--color-accent-primary);
-    color: var(--color-bg-dark);
-    font-weight: bold;
-    transition: all 0.3s ease;
-    border-radius: 5px;
-    padding: 8px 15px;
-    text-decoration: none;
-    display: inline-block;
-}
-
-.btn-adn-edit:hover {
-    background-color: var(--color-accent-secondary);
-    box-shadow: 0 0 8px rgba(118, 255, 3, 0.7);
-}
-
-/* Botón Cancelar/Eliminar (Rojo/Danger) */
-.btn-cancelar, .gestion-container .btn-eliminar {
-    background-color: var(--color-danger) !important;
-    color: var(--color-text-light) !important;
-    font-weight: bold;
-    border: none;
-    border-radius: 5px;
-    padding: 8px 15px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-/* ------------------------------------------------------------------ */
-/* --- 5. CONTENIDO PRINCIPAL (GESTIÓN/TABLAS) --- */
-/* ------------------------------------------------------------------ */
-
-.gestion-container, .dashboard-container {
-    max-width: 1200px; 
-    margin: 30px auto;
-    padding: 30px;
-    background-color: var(--color-bg-card);
-    border-radius: 15px;
-    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.6);
-}
-
-/* Estilo para las Tablas */
-.gestion-container table {
-    background-color: var(--color-text-light); /* Fondo BLANCO para las tablas */
-    color: var(--color-bg-dark); /* Texto oscuro en tablas */
-    border-radius: 10px;
-    overflow: hidden; 
-    width: 100%;
-    margin-top: 20px;
-    border: 1px solid var(--color-border-subtle);
-}
-
-.gestion-container tbody tr.table-warning-adn {
-    background-color: #333315; /* Un gris/verde oscuro sutil para resaltar */
-}
-
-.gestion-container thead {
-    background-color: var(--color-bg-card); /* Cabecera oscura */
-    color: var(--color-text-light); /* Texto blanco en cabecera */
-}
-
-.gestion-container tbody tr:nth-child(even) {
-    background-color: #F8F8F8; /* Líneas alternadas de gris muy claro */
-}
-
-/* Estilos para los tags de Estado */
-.tag-estado {
-    display: inline-block;
-    padding: 4px 10px;
-    border-radius: 5px;
-    font-weight: bold;
-    font-size: 0.85em;
+    letter-spacing: 1px;
     text-transform: uppercase;
-    color: var(--color-bg-dark); 
-}
-.tag-estado.confirmado {
-    background-color: var(--color-accent-primary);
-}
-.tag-estado.pendiente {
-    background-color: #FFC107; 
-}
-.tag-estado.finalizado {
-    background-color: var(--color-border-subtle);
-    color: var(--color-text-light); 
 }
 
-/* Estilos específicos de turnos */
-.turno-disponible-card {
-    background-color: var(--color-text-light); 
-    color: var(--color-bg-dark); 
-    padding: 15px 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+/* --- ESTILO DE CAMPOS DE FORMULARIO --- */
+.form-field {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-field label {
+    display: block;
+    margin-bottom: 8px;
+    color: #cccccc;
+    font-weight: normal;
+    font-size: 1.1em;
+}
+
+.form-field input[type="text"],
+.form-field input[type="password"],
+.form-field input[type="email"],
+.form-field select,
+.form-field textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #555555;
+    border-radius: 6px;
+    box-sizing: border-box;
+    background-color: #2a2a2a;
+    color: #ffffff;
+    font-size: 1em;
+}
+
+.form-field input[type="text"]:focus,
+.form-field input[type="password"]:focus,
+.form-field input[type="email"]:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+    border-color: #30e333;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(48, 227, 51, 0.3);
+}
+
+/* --- ESTILO DEL BOTÓN --- */
+.form-submit-btn {
+    width: 100%;
+    padding: 15px;
+    background-color: #30e333; /* Verde vibrante del logo */
+    color: #000000;
+    border: none;
+    border-radius: 6px;
+    font-size: 1.2em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-top: 20px;
+}
+
+.form-submit-btn:hover {
+    background-color: #25bb25; /* Un verde ligeramente más oscuro al pasar el cursor */
+    transform: translateY(-2px);
+}
+
+/* Estilo para los requisitos de contraseña */
+.password-requirements {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 10px;
+    font-size: 0.9em;
+    color: #f0f0f0;
+    text-align: left;
+}
+
+.password-requirements li {
+    margin-bottom: 5px;
+    padding-left: 20px;
+    position: relative;
+}
+
+.password-requirements li::before {
+    content: '✖';
+    font-weight: bold;
+    color: #e74c3c;
+    position: absolute;
+    left: 0;
+}
+
+/* --- ESTILO DE ENLACES --- */
+.links {
+    margin-top: 30px;
+    font-size: 1.05em;
+}
+
+.links a {
+    color: #30e333;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.links a:hover {
+    color: #ffffff;
+}
+
+/* Estilos para mensajes de Django */
+ul.messages {
+    list-style: none;
+    padding: 0;
+    margin-top: 15px;
+}
+
+ul.messages li {
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+ul.messages li.success {
+    background-color: rgba(48, 227, 51, 0.1);
+    color: #30e333;
+    border: 1px solid #30e333;
+}
+
+ul.messages li.error {
+    background-color: rgba(255, 99, 71, 0.1);
+    color: #ff6347;
+    border: 1px solid #ff6347;
+}
+
+/* --- DISEÑO DEL DASHBOARD --- */
+.dashboard-container {
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 20px;
+    background-color: #1a1a1a;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
+    color: #f0f0f0;
+    font-family: Arial, sans-serif;
+}
+
+.dashboard-container header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 15px;
+    border-bottom: 1px solid #30e333;
+    padding-bottom: 15px;
+}
+
+.dashboard-container .logo img {
+    max-width: 120px;
+    height: auto;
+    border-radius: 8px;
+}
+
+.dashboard-container .user-info {
+    text-align: right;
+}
+
+.dashboard-container .user-info p {
+    margin: 0;
+    font-weight: 500;
+}
+
+.dashboard-container .user-info a {
+    color: #30e333;
     font-weight: bold;
+    text-decoration: none;
 }
-.turno-hora-display span {
-    background-color: var(--color-accent-primary);
-    color: var(--color-bg-dark);
-    padding: 3px 8px;
-    border-radius: 4px;
-    margin: 0 5px;
+
+.dashboard-container .user-info a:hover {
+    text-decoration: underline;
 }
-.btn-reservar-turno {
-    font-size: 1em !important;
-    padding: 8px 15px !important;
+
+.dashboard-container nav {
+    margin: 25px 0;
+}
+
+.dashboard-container nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: 25px;
+}
+
+.dashboard-container nav ul li {
+    display: inline;
+}
+
+.dashboard-container nav ul li a {
+    color: #30e333;
+    text-decoration: none;
+    font-weight: 600;
+    padding: 8px 15px;
+    border-radius: 6px;
+    transition: background-color 0.3s ease;
+}
+
+.dashboard-container nav ul li a:hover {
+    background-color: rgba(48, 227, 51, 0.2);
+}
+
+.dashboard-container main h2 {
+    font-size: 1.8em;
+    color: #30e333;
+    margin-bottom: 15px;
+}
+
+.dashboard-container main p {
+    font-size: 1.1em;
+    line-height: 1.5;
+}
+
+/* --- ESTILOS ESPECÍFICOS PARA LA GESTIÓN DE USUARIOS --- */
+.gestion-container {
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 20px;
+    background-color: #1a1a1a;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
+    color: #f0f0f0;
+    font-family: Arial, sans-serif;
+}
+
+.gestion-container h1 {
+    color: #30e333;
+    text-align: center;
+    border-bottom: 2px solid #30e333;
+    padding-bottom: 10px;
+}
+
+.gestion-container table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 20px;
+    background-color: #2a2a2a;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.gestion-container thead {
+    background-color: #30e333;
+    color: #000000;
+}
+
+.gestion-container th,
+.gestion-container td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #555555;
+}
+
+.gestion-container tbody tr:hover {
+    background-color: #333333;
+    transition: background-color 0.3s ease;
+}
+
+.gestion-container a {
+    color: #30e333;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.gestion-container a:hover {
+    color: #ffffff;
+}
+
+.gestion-container .btn-editar {
+    background-color: #30e333;
+    color: #000000;
+    padding: 8px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.gestion-container .btn-editar:hover {
+    background-color: #25bb25;
+}
+
+.gestion-container .btn-eliminar {
+    background-color: #e74c3c;
+    color: #ffffff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.gestion-container .btn-eliminar:hover {
+    background-color: #c0392b;
+}
+
+.gestion-container form {
+    display: inline-block;
+}
+
+/* Estilos de mensajes para la vista de gestión */
+.gestion-container .messages {
+    margin: 20px 0;
+}
+
+.gestion-container .messages .success {
+    background-color: rgba(48, 227, 51, 0.1);
+    color: #30e333;
+    border: 1px solid #30e333;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.gestion-container .messages .error {
+    background-color: rgba(255, 99, 71, 0.1);
+    color: #ff6347;
+    border: 1px solid #ff6347;
+    padding: 10px;
+    border-radius: 5px;
 }

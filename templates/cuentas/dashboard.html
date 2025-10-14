@@ -15,16 +15,16 @@
     
     <div class="card p-4 bg-dark text-white shadow">
         <h2>Panel de Acceso Rápido</h2>
-        <p>Utiliza los enlaces a continuación según tu rol y permisos.</p>
         
         {% with user.profile.rol as rol %}
             
             {% if rol == "Administrador" or rol == "Entrenador" %}
                 
-                <h4 class="mt-3 text-info">Gestión de Turnos (Staff)</h4>
+                <h4 class="mt-3 text-info">Gestión de Turnos </h4>
                 <div class="d-flex flex-wrap gap-2">
                     <a href="{% url 'turnos:staff_list' %}" class="btn btn-outline-info">Ver Todos los Turnos</a>
                     <a href="{% url 'turnos:staff_create' %}" class="btn btn-outline-info">Crear Nuevo Cupo/Asignar</a>
+                    
                 </div>
 
             {% endif %}
@@ -36,6 +36,9 @@
                     <a href="{% url 'gestion_planes' %}" class="btn btn-outline-warning">Gestionar Planes y Precios</a>
                     <a href="{% url 'gestion_membresias' %}" class="btn btn-outline-warning">Gestionar Membresías</a>
                     <a href="{% url 'gestion_clases' %}" class="btn btn-outline-warning">Gestionar Clases</a>
+                    <a href="{% url 'accesorios:inventario_list' %}" class="btn btn-outline-warning">Gestionar Accesorios</a>
+
+                    
                 </div>
             
             {% elif rol == "Entrenador" %}
@@ -43,6 +46,8 @@
                 <div class="d-flex flex-wrap gap-2">
                     <a href="{% url 'asignar_rutinas' %}" class="btn btn-outline-info">Asignar Rutinas</a>
                     <a href="{% url 'lista_alumnos' %}" class="btn btn-outline-info">Ver Mis Alumnos (Socios)</a>
+                    <a href="{% url 'accesorios:inventario_list' %}" class="btn btn-outline-warning">Gestionar Accesorios</a>
+
                 </div>
 
             {% elif rol == "Socio" %}

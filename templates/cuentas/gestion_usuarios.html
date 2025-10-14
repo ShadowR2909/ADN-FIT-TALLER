@@ -42,11 +42,13 @@
                             {% endif %}
                         </td>
                         <td>
-                            <a href="#" class="btn btn-sm btn-info" disabled>Editar</a>
-                            <form method="POST" action="#" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que quieres eliminar a {{ usuario.username }}?');">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-sm btn-danger" disabled>Eliminar</button>
+                            <a href="{% url 'editar_usuario' usuario.id %}" class="btn btn-sm btn-info">Editar</a>
+                            <form method="POST" action="" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que quieres eliminar a {{ usuario.username }}?');">
+                            {% csrf_token %}
+                             <input type="hidden" name="eliminar_usuario_id" value="{{ usuario.id }}">
+                            <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
                             </form>
+
                         </td>
                     </tr>
                     {% empty %}

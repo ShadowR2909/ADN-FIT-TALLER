@@ -134,7 +134,19 @@ def editar_perfil(request):
 @login_required
 @user_passes_test(es_administrador)
 def gestion_usuarios(request):
-    """Muestra lista de todos los usuarios (Solo Admin)."""
+    """Muestra lista de todos los usuarios (Solo Admin) y permite eliminar."""
+    
+    if request.method == 'POST':
+        user_id = request.POST.get('eliminar_usuario_id')
+        if user_id:
+            usuario_a_eliminar = get_object_or_404(User, id=user_id)
+            if usuario_a_eliminar != request.user:  # Evita auto-eliminación
+                usuario_a_eliminar.delete()
+                messages.success(request, f"Usuario '{usuario_a_eliminar.username}' eliminado correctamente.")
+            else:
+                messages.error(request, "No puedes eliminar tu propio usuario.")
+        return redirect('gestion_usuarios')
+    
     usuarios = User.objects.all().order_by('username')
     return render(request, 'cuentas/gestion_usuarios.html', {'usuarios': usuarios})
 
@@ -169,7 +181,7 @@ def editar_usuario_view(request, user_id):
             usuario_a_editar.save() 
             
             messages.success(request, f"Usuario '{usuario_a_editar.username}' actualizado exitosamente. Estado Activo: {usuario_a_editar.is_active}")
-            return redirect('gestion_usuarios')
+            return redirect('cuentas:gestion_usuarios')
         else:
             messages.error(request, "Error al actualizar el usuario. Revisa el formulario.")
     else:
@@ -183,6 +195,7 @@ def editar_usuario_view(request, user_id):
     }
     
     return render(request, 'cuentas/editar_usuario.html', context)
+    
 
 @login_required
 @user_passes_test(es_entrenador)
