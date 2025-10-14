@@ -7,127 +7,131 @@
     <title>Iniciar Sesión - Gimnasio ADN-FIT</title>
     <link href="{% static 'vendor/css/bootstrap.min.css' %}" rel="stylesheet">
     <style>
-        body {
-            background-color: #ffffff;
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .login-container {
-            background-color: #1a1a1a;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
-            width: 100%;
-            max-width: 450px;
-            text-align: center;
-            border: 1px solid #30e333;
-        }
-        
-        .logo {
-            margin-bottom: 25px;
-        }
-        
-        .logo img {
-            max-width: 70px;
-            height: auto;
-            box-shadow: 0 5px 15px rgba(48, 227, 51, 0.4);
-        }
-        
-        .login-container h2 {
-            color: #30e333;
-            margin-bottom: 30px;
-            font-size: 2.2em;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-        
-        .form-field {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-        
-        .form-field label {
-            display: block;
-            margin-bottom: 8px;
-            color: #f0f0f0;
-            font-weight: bold;
-        }
-        
-        .form-field input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #555;
-            border-radius: 6px;
-            background-color: #2a2a2a;
-            color: #f0f0f0;
-            font-size: 16px;
-            box-sizing: border-box;
-        }
-        
-        .form-field input:focus {
-            outline: none;
-            border-color: #30e333;
-            box-shadow: 0 0 5px rgba(48, 227, 51, 0.5);
-        }
-        
-        .form-submit-btn {
-            width: 100%;
-            padding: 15px;
-            background-color: #30e333;
-            color: #1a1a1a;
-            border: none;
-            border-radius: 6px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .form-submit-btn:hover {
-            background-color: #28b82d;
-            transform: translateY(-2px);
-        }
-        
-        .messages {
-            list-style: none;
-            padding: 0;
-            margin: 20px 0;
-        }
-        
-        .messages li {
-            padding: 10px;
-            border-radius: 6px;
-            margin-bottom: 10px;
-            background-color: #dc3545;
-            color: white;
-        }
-        
-        .links {
-            margin-top: 20px;
-        }
-        
-        .links p {
-            color: #ccc;
-            margin: 0;
-        }
-        
-        .links a {
-            color: #30e333;
-            text-decoration: none;
-        }
-        
-        .links a:hover {
-            text-decoration: underline;
-        }
-    </style>
+    body {
+        background-color: #ffffff;
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .login-container {
+        background-color: #1a1a1a;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+        width: 100%;
+        max-width: 350px; /* 🔹 Reducido de 450px a 350px */
+        text-align: center;
+        border: 1px solid #30e333;
+    }
+
+    .logo {
+        margin-bottom: 15px;
+    }
+
+    .logo img {
+        max-width: 55px; /* 🔹 Más chico el logo */
+        height: auto;
+        box-shadow: 0 4px 10px rgba(48, 227, 51, 0.4);
+    }
+
+    .login-container h2 {
+        color: #30e333;
+        margin-bottom: 20px;
+        font-size: 1.6em; /* 🔹 Reducido */
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    .form-field {
+        margin-bottom: 15px;
+        text-align: left;
+    }
+
+    .form-field label {
+        display: block;
+        margin-bottom: 6px;
+        color: #f0f0f0;
+        font-weight: bold;
+        font-size: 0.9em; /* 🔹 Más pequeño */
+    }
+
+    .form-field input {
+        width: 100%;
+        padding: 10px 12px;
+        border: 2px solid #555;
+        border-radius: 6px;
+        background-color: #2a2a2a;
+        color: #f0f0f0;
+        font-size: 14px; /* 🔹 Reducido */
+        box-sizing: border-box;
+    }
+
+    .form-field input:focus {
+        outline: none;
+        border-color: #30e333;
+        box-shadow: 0 0 4px rgba(48, 227, 51, 0.5);
+    }
+
+    .form-submit-btn {
+        width: 100%;
+        padding: 12px;
+        background-color: #30e333;
+        color: #1a1a1a;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .form-submit-btn:hover {
+        background-color: #28b82d;
+        transform: translateY(-2px);
+    }
+
+    .messages {
+        list-style: none;
+        padding: 0;
+        margin: 15px 0;
+    }
+
+    .messages li {
+        padding: 8px;
+        border-radius: 6px;
+        margin-bottom: 8px;
+        background-color: #dc3545;
+        color: white;
+        font-size: 0.9em;
+    }
+
+    .links {
+        margin-top: 15px;
+    }
+
+    .links p {
+        color: #ccc;
+        margin: 0;
+        font-size: 0.9em;
+    }
+
+    .links a {
+        color: #30e333;
+        text-decoration: none;
+    }
+
+    .links a:hover {
+        text-decoration: underline;
+    }
+</style>
+
 </head>
 <body>
     <div class="login-container">

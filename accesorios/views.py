@@ -155,7 +155,3 @@ def reposicion_create(request, pk):
         'page_title': 'Procesar Reposición de Stock'
     }
     return render(request, 'accesorios/reposicion_form.html', context)
-
-    
-
-    

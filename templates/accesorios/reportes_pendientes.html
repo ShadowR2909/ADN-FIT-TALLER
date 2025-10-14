@@ -7,14 +7,14 @@
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Reportes Pendientes de Confirmación</h1>
+    <h2>Reportes Pendientes de Confirmación</h2>
     <a href="{% url 'accesorios:inventario_list' %}" class="btn btn-secondary">
         Volver a Inventario
     </a>
 </div>
 
 <p class="text-muted mb-4">
-    Revisa los reportes de accesorios faltantes o dañados. Solo los reportes en estado **PENDIENTE** pueden ser confirmados o descartados.
+    Revisa los reportes de accesorios faltantes o dañados. Solo los reportes en estado *PENDIENTE* pueden ser confirmados o descartados.
 </p>
 
 {% if messages %}
