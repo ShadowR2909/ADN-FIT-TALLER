@@ -8,7 +8,7 @@
     
     <div class="row mb-4">
         <div class="col-12">
-            <h1 class="text-white">Bienvenido/a, {{ user.get_username|capfirst }}</h1>
+            <h2 class="text-white">Bienvenido/a, {{ user.get_username|capfirst }}</h2>
             <p class="lead text-white-50">Rol actual: <span class="badge bg-success">{{ user.profile.rol|capfirst }}</span></p>
         </div>
     </div>

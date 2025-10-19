@@ -5,13 +5,18 @@
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Inventario de Accesorios</h1>
+    <h2>Inventario de Accesorios</h2>
     <div>
-        <a href="{% url 'accesorios:reporte_faltante_create' %}" class="btn btn-primary">
-            Reportar Faltante
+        {% if user.profile.rol == 'Administrador' %}
+            <a href="{% url 'accesorios:accesorio_create' %}" class="btn btn-success">
+                <i class="fas fa-plus-circle me-1"></i>Agregar Accesorio
+            </a>
+        {% endif %}
+        <a href="{% url 'accesorios:reporte_faltante_create' %}" class="btn btn-primary ms-2">
+            <i class="fas fa-exclamation-triangle me-1"></i>Reportar Faltante
         </a>
         <a href="{% url 'accesorios:historial_accesorios' %}" class="btn btn-secondary ms-2">
-            Ver Historial
+            <i class="fas fa-history me-1"></i>Ver Historial
         </a>
     </div>
 </div>
@@ -34,6 +39,9 @@
                 <th scope="col">Accesorio</th>
                 <th scope="col">Descripción</th>
                 <th scope="col" class="text-center">Cantidad Total</th>
+                {% if user.profile.rol == 'Administrador' %}
+                <th scope="col" class="text-center">Acciones</th>
+                {% endif %}
             </tr>
         </thead>
         <tbody>
@@ -50,10 +58,26 @@
                 <td class="text-center">
                     <span class="badge bg-success py-2 px-3 fs-6">{{ accesorio.cantidad_total }}</span>
                 </td>
+                {% if user.profile.rol == 'Administrador' %}
+                <td class="text-center">
+                    <div class="btn-group" role="group">
+                        <a href="{% url 'accesorios:accesorio_update' accesorio.pk %}" 
+                           class="btn btn-sm btn-outline-primary" 
+                           title="Editar accesorio">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="{% url 'accesorios:accesorio_delete' accesorio.pk %}" 
+                           class="btn btn-sm btn-outline-danger" 
+                           title="Eliminar accesorio">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </td>
+                {% endif %}
             </tr>
             {% empty %}
             <tr>
-                <td colspan="3" class="text-center text-muted py-4">
+                <td colspan="{% if user.profile.rol == 'Administrador' %}4{% else %}3{% endif %}" class="text-center text-muted py-4">
                     No hay accesorios registrados en el inventario.
                 </td>
             </tr>

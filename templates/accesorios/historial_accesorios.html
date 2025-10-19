@@ -7,14 +7,14 @@
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Historial de Accesorios</h1>
+    <h2>Historial Completo de Accesorios</h2>
     <a href="{% url 'accesorios:inventario_list' %}" class="btn btn-secondary">
-        Volver a Inventario
+        <i class="fas fa-arrow-left me-1"></i>Volver a Inventario
     </a>
 </div>
 
 <p class="text-muted mb-4">
-    Aquí se muestra el historial de reportes, confirmaciones y reposiciones de stock.
+    Historial completo de acciones: gestión de accesorios (crear/editar/eliminar) y reportes de faltantes.
 </p>
 
 {% if messages %}
@@ -28,54 +28,145 @@
     </div>
 {% endif %}
 
-<div class="table-responsive">
-    <table class="table table-hover align-middle">
-        <thead>
-            <tr>
-                <th scope="col">Accesorio</th>
-                <th scope="col">Cantidad Faltante</th>
-                <th scope="col">Estado</th>
-                <th scope="col">Reportado Por</th>
-                <th scope="col">Confirmado/Procesado Por</th>
-                <th scope="col">Fecha de Reporte</th>
-                <th scope="col">Fecha Confirmación/Reposición</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for reporte in reportes %}
-            <tr class="{% if reporte.estado == 'PENDIENTE' %}table-warning-adn{% elif reporte.estado == 'DESCARTADO' %}table-secondary{% else %}table-success{% endif %}">
-                <td>{{ reporte.accesorio.nombre }}</td>
-                <td>{{ reporte.cantidad_faltante }}</td>
-                <td>{{ reporte.get_estado_display }}</td>
-                <td>{{ reporte.empleado_reporte.username }}</td>
-                <td>
-                    {% if reporte.empleado_confirmacion %}
-                        {{ reporte.empleado_confirmacion.username }}
-                    {% elif reporte.reposicion and reporte.reposicion.administrador %}
-                        {{ reporte.reposicion.administrador.username }}
-                    {% else %}
-                        -
-                    {% endif %}
-                </td>
-                <td>{{ reporte.fecha_reporte|localtime|date:"d M Y H:i" }}</td>
-                <td>
-                    {% if reporte.fecha_confirmacion %}
-                        {{ reporte.fecha_confirmacion|localtime|date:"d M Y H:i" }}
-                    {% elif reporte.reposicion %}
-                        {{ reporte.reposicion.fecha_compra|localtime|date:"d M Y H:i" }}
-                    {% else %}
-                        -
-                    {% endif %}
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="7" class="text-center text-muted py-4">
-                    No hay historial registrado todavía.
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<!-- Tabs para diferentes tipos de historial -->
+<ul class="nav nav-tabs mb-3" id="historialTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="acciones-tab" data-bs-toggle="tab" data-bs-target="#acciones" type="button" role="tab">
+            <i class="fas fa-cogs me-1"></i>Gestión de Accesorios
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="reportes-tab" data-bs-toggle="tab" data-bs-target="#reportes" type="button" role="tab">
+            <i class="fas fa-exclamation-triangle me-1"></i>Reportes de Faltantes
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content" id="historialTabsContent">
+    <!-- Tab: Gestión de Accesorios (CRUD) -->
+    <div class="tab-pane fade show active" id="acciones" role="tabpanel">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th scope="col">Accesorio</th>
+                        <th scope="col">Acción</th>
+                        <th scope="col">Usuario</th>
+                        <th scope="col">Fecha</th>
+                        <th scope="col">Detalles</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for accion in historial_acciones %}
+                    <tr class="{% if accion.accion == 'CREADO' %}table-success{% elif accion.accion == 'EDITADO' %}table-info{% elif accion.accion == 'ELIMINADO' %}table-danger{% endif %}">
+                        <td class="fw-bold">{{ accion.accesorio_nombre }}</td>
+                        <td>
+                            {% if accion.accion == 'CREADO' %}
+                                <span class="badge bg-success">
+                                    <i class="fas fa-plus-circle me-1"></i>{{ accion.get_accion_display }}
+                                </span>
+                            {% elif accion.accion == 'EDITADO' %}
+                                <span class="badge bg-info">
+                                    <i class="fas fa-edit me-1"></i>{{ accion.get_accion_display }}
+                                </span>
+                            {% elif accion.accion == 'ELIMINADO' %}
+                                <span class="badge bg-danger">
+                                    <i class="fas fa-trash me-1"></i>{{ accion.get_accion_display }}
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if accion.usuario %}
+                                <span class="badge bg-secondary">{{ accion.usuario.username }}</span>
+                            {% else %}
+                                <span class="text-muted">Usuario eliminado</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ accion.fecha|localtime|date:"d M Y H:i" }}</td>
+                        <td>
+                            <small class="text-muted">{{ accion.detalles|default:"Sin detalles adicionales" }}</small>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-4">
+                            No hay acciones registradas todavía.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Tab: Reportes de Faltantes -->
+    <div class="tab-pane fade" id="reportes" role="tabpanel">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th scope="col">Accesorio</th>
+                        <th scope="col">Cantidad Faltante</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Reportado Por</th>
+                        <th scope="col">Confirmado Por</th>
+                        <th scope="col">Fecha Reporte</th>
+                        <th scope="col">Fecha Confirmación</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reporte in reportes %}
+                    <tr class="{% if reporte.estado == 'PENDIENTE' %}table-warning{% elif reporte.estado == 'DESCARTADO' %}table-secondary{% elif reporte.estado == 'CONFIRMADO' %}table-success{% else %}table-info{% endif %}">
+                        <td class="fw-bold">{{ reporte.accesorio.nombre }}</td>
+                        <td>
+                            <span class="badge bg-warning text-dark">{{ reporte.cantidad_faltante }} unidades</span>
+                        </td>
+                        <td>
+                            {% if reporte.estado == 'PENDIENTE' %}
+                                <span class="badge bg-warning">{{ reporte.get_estado_display }}</span>
+                            {% elif reporte.estado == 'CONFIRMADO' %}
+                                <span class="badge bg-success">{{ reporte.get_estado_display }}</span>
+                            {% elif reporte.estado == 'DESCARTADO' %}
+                                <span class="badge bg-secondary">{{ reporte.get_estado_display }}</span>
+                            {% else %}
+                                <span class="badge bg-info">{{ reporte.get_estado_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if reporte.empleado_reporte %}
+                                <span class="badge bg-primary">{{ reporte.empleado_reporte.username }}</span>
+                            {% else %}
+                                <span class="text-muted">Usuario eliminado</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if reporte.empleado_confirmacion %}
+                                <span class="badge bg-secondary">{{ reporte.empleado_confirmacion.username }}</span>
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ reporte.fecha_reporte|localtime|date:"d M Y H:i" }}</td>
+                        <td>
+                            {% if reporte.fecha_confirmacion %}
+                                {{ reporte.fecha_confirmacion|localtime|date:"d M Y H:i" }}
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">
+                            No hay reportes registrados todavía.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
 </div>
+
 {% endblock content %}

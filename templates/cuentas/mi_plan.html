@@ -5,7 +5,7 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h1 class="text-primary mb-4">⭐ Mi Plan de Membresía</h1>
+    <h2 class="text-primary mb-4">⭐ Mi Plan de Membresía</h2>
     
     {% if membresia %}
         
@@ -59,7 +59,7 @@
         </div>
 
         {% if planes_disponibles %}
-            <h2 class="text-light mt-5">Planes Disponibles</h2>
+            <h3 class="text-light mt-5">Planes Disponibles</h3>
             <div class="row">
                 {% for p in planes_disponibles %}
                     <div class="col-md-4 mb-3">
@@ -77,7 +77,7 @@
     {% endif %}
 
     <div class="mt-5">
-        <h2 class="text-light">Tus Próximas Clases</h2>
+        <h3 class="text-light">Tus Próximas Clases</h3>
         <div class="alert alert-secondary text-dark">
             Aquí se mostraría la lista de las clases que reservaste (Implementación en `mis_clases_view`).
         </div>

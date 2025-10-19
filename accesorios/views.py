@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Accesorio, ReporteFaltante, Reposicion
-from .forms import ReporteFaltanteForm, ReposicionForm
+from .models import Accesorio, ReporteFaltante, Reposicion, HistorialAccesorio
+from .forms import ReporteFaltanteForm, ReposicionForm, AccesorioForm
 from django.utils import timezone
 
 # Importar lógica de roles si la tienes, por ahora solo requerimos staff
@@ -15,16 +15,16 @@ class StaffRequiredMixin(UserPassesTestMixin):
         return self.request.user.is_authenticated and (
             self.request.user.profile.rol in ['Entrenador', 'Administrador']
         )
-# NUEVO: Historial completo de accesorios (reportes y reposiciones)
+# NUEVO: Historial completo de accesorios (reportes, reposiciones y acciones CRUD)
 @login_required
 def historial_accesorios(request):
-    """Muestra todos los reportes y reposiciones, con quién y cuándo se realizaron."""
+    """Muestra todos los reportes, reposiciones y acciones CRUD, con quién y cuándo se realizaron."""
     reportes = ReporteFaltante.objects.all().select_related('accesorio', 'empleado_reporte', 'empleado_confirmacion')
-    reposiciones = Reposicion.objects.all().select_related('reporte', 'administrador')
+    historial_acciones = HistorialAccesorio.objects.all().select_related('usuario')
     
     context = {
         'reportes': reportes,
-        'reposiciones': reposiciones,
+        'historial_acciones': historial_acciones,
         'page_title': 'Historial de Accesorios',
     }
     return render(request, 'accesorios/historial_accesorios.html', context)
@@ -156,6 +156,137 @@ def reposicion_create(request, pk):
     }
     return render(request, 'accesorios/reposicion_form.html', context)
 
-    
 
+# 5. CREAR NUEVO ACCESORIO (Solo Administradores)
+@login_required
+def accesorio_create(request):
+    """
+    Permite al Administrador agregar nuevos accesorios al inventario.
+    """
+    # Verificar que el usuario sea administrador
+    if not hasattr(request.user, 'profile') or request.user.profile.rol != 'Administrador':
+        messages.error(request, "Permiso denegado: solo Administradores pueden agregar nuevos accesorios.")
+        return redirect('accesorios:inventario_list')
     
+    if request.method == 'POST':
+        form = AccesorioForm(request.POST)
+        if form.is_valid():
+            accesorio = form.save(commit=False)
+            accesorio.creado_por = request.user
+            accesorio.save()
+            
+            # Registrar en el historial
+            HistorialAccesorio.objects.create(
+                accesorio_nombre=accesorio.nombre,
+                accesorio_id=accesorio.id,
+                accion='CREADO',
+                usuario=request.user,
+                detalles=f'Cantidad inicial: {accesorio.cantidad_total} unidades. Descripción: {accesorio.descripcion or "Sin descripción"}'
+            )
+            
+            messages.success(request, f'¡Accesorio "{accesorio.nombre}" agregado exitosamente al inventario!')
+            return redirect('accesorios:inventario_list')
+    else:
+        form = AccesorioForm()
+    
+    context = {
+        'form': form,
+        'page_title': 'Agregar Nuevo Accesorio'
+    }
+    return render(request, 'accesorios/accesorio_form.html', context)
+
+# 6. EDITAR ACCESORIO EXISTENTE (Solo Administradores)
+@login_required
+def accesorio_update(request, pk):
+    """
+    Permite al Administrador editar accesorios existentes en el inventario.
+    """
+    accesorio = get_object_or_404(Accesorio, pk=pk)
+    
+    # Verificar que el usuario sea administrador
+    if not hasattr(request.user, 'profile') or request.user.profile.rol != 'Administrador':
+        messages.error(request, "Permiso denegado: solo Administradores pueden editar accesorios.")
+        return redirect('accesorios:inventario_list')
+    
+    if request.method == 'POST':
+        # Guardar valores anteriores para el historial
+        nombre_anterior = accesorio.nombre
+        cantidad_anterior = accesorio.cantidad_total
+        descripcion_anterior = accesorio.descripcion
+        
+        form = AccesorioForm(request.POST, instance=accesorio)
+        if form.is_valid():
+            accesorio = form.save(commit=False)
+            accesorio.modificado_por = request.user
+            accesorio.save()
+            
+            # Registrar cambios en el historial
+            cambios = []
+            if nombre_anterior != accesorio.nombre:
+                cambios.append(f'Nombre: "{nombre_anterior}" → "{accesorio.nombre}"')
+            if cantidad_anterior != accesorio.cantidad_total:
+                cambios.append(f'Cantidad: {cantidad_anterior} → {accesorio.cantidad_total}')
+            if descripcion_anterior != accesorio.descripcion:
+                cambios.append(f'Descripción: "{descripcion_anterior or "Sin descripción"}" → "{accesorio.descripcion or "Sin descripción"}"')
+            
+            HistorialAccesorio.objects.create(
+                accesorio_nombre=accesorio.nombre,
+                accesorio_id=accesorio.id,
+                accion='EDITADO',
+                usuario=request.user,
+                detalles=f'Cambios realizados: {"; ".join(cambios)}' if cambios else 'Sin cambios detectados'
+            )
+            
+            messages.success(request, f'¡Accesorio "{accesorio.nombre}" actualizado exitosamente!')
+            return redirect('accesorios:inventario_list')
+    else:
+        form = AccesorioForm(instance=accesorio)
+    
+    context = {
+        'form': form,
+        'page_title': f'Editar Accesorio: {accesorio.nombre}',
+        'accesorio': accesorio
+    }
+    return render(request, 'accesorios/accesorio_form.html', context)
+
+# 7. ELIMINAR ACCESORIO (Solo Administradores)
+@login_required
+def accesorio_delete(request, pk):
+    """
+    Permite al Administrador eliminar accesorios del inventario.
+    """
+    accesorio = get_object_or_404(Accesorio, pk=pk)
+    
+    # Verificar que el usuario sea administrador
+    if not hasattr(request.user, 'profile') or request.user.profile.rol != 'Administrador':
+        messages.error(request, "Permiso denegado: solo Administradores pueden eliminar accesorios.")
+        return redirect('accesorios:inventario_list')
+    
+    # Verificar si el accesorio tiene reportes asociados
+    reportes_asociados = ReporteFaltante.objects.filter(accesorio=accesorio).count()
+    
+    if request.method == 'POST':
+        nombre_accesorio = accesorio.nombre
+        accesorio_id = accesorio.id
+        cantidad_stock = accesorio.cantidad_total
+        descripcion_accesorio = accesorio.descripcion
+        
+        # Registrar en el historial ANTES de eliminar
+        HistorialAccesorio.objects.create(
+            accesorio_nombre=nombre_accesorio,
+            accesorio_id=accesorio_id,
+            accion='ELIMINADO',
+            usuario=request.user,
+            detalles=f'Eliminado con {cantidad_stock} unidades en stock. Descripción: {descripcion_accesorio or "Sin descripción"}'
+        )
+        
+        accesorio.delete()
+        messages.success(request, f'¡Accesorio "{nombre_accesorio}" eliminado exitosamente del inventario!')
+        return redirect('accesorios:inventario_list')
+    
+    context = {
+        'accesorio': accesorio,
+        'reportes_asociados': reportes_asociados,
+        'page_title': f'Eliminar Accesorio: {accesorio.nombre}'
+    }
+    return render(request, 'accesorios/accesorio_delete.html', context)

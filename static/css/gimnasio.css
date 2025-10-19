@@ -2,7 +2,7 @@
 
 /* --- ESTILOS GENERALES --- */
 body {
-    background-color: #000000; /* Fondo negro como el logo */
+    background-color: #ffffff; /* Fondo negro como el logo */
     font-family: Arial, sans-serif;
     color: #f0f0f0; /* Color de texto general claro */
     min-height: 100vh;
@@ -17,6 +17,11 @@ body {
     align-items: center;
     min-height: 100vh;
     width: 100%;
+}
+.help-text {
+    color: #a32424; /* ← COLOR DE LAS LETRAS GRISES */
+    font-size: 11px;
+    margin-top: 4px;
 }
 
 /* --- DISEÑO DE LOGO --- */
@@ -86,11 +91,12 @@ header h1 {
 }
 
 .auth-card h2 {
-    color: #30e333; /* Título en el color del logo */
-    margin-bottom: 30px;
-    font-size: 2.2em;
+    color: #30e333 !important; /* Título en el color del logo */
+    margin-bottom: 30px !important;
+    font-size: 2rem !important; /* Tamaño uniforme */
     letter-spacing: 1px;
     text-transform: uppercase;
+    font-weight: bold !important;
 }
 
 /* --- ESTILO DE CAMPOS DE FORMULARIO --- */
@@ -292,10 +298,19 @@ ul.messages li.error {
     background-color: rgba(48, 227, 51, 0.2);
 }
 
+/* --- ESTILOS UNIFICADOS PARA TÍTULOS --- */
+h2 {
+    font-size: 2rem !important; /* Tamaño uniforme para todos los h2 */
+    color: #30e333 !important; /* Color uniforme del logo */
+    margin-bottom: 1.5rem !important;
+    font-weight: bold !important;
+    letter-spacing: 0.5px !important;
+}
+
 .dashboard-container main h2 {
-    font-size: 1.8em;
+    font-size: 2rem;
     color: #30e333;
-    margin-bottom: 15px;
+    margin-bottom: 1.5rem;
 }
 
 .dashboard-container main p {
@@ -315,11 +330,13 @@ ul.messages li.error {
     font-family: Arial, sans-serif;
 }
 
-.gestion-container h1 {
+.gestion-container h1,
+.gestion-container h2 {
     color: #30e333;
     text-align: center;
     border-bottom: 2px solid #30e333;
     padding-bottom: 10px;
+    font-size: 2rem;
 }
 
 .gestion-container table {
@@ -361,8 +378,8 @@ ul.messages li.error {
 }
 
 .gestion-container .btn-editar {
-    background-color: #30e333;
-    color: #000000;
+    background-color: #144c96;
+    color: #ffffff;
     padding: 8px 12px;
     border-radius: 6px;
     text-decoration: none;
@@ -370,7 +387,7 @@ ul.messages li.error {
 }
 
 .gestion-container .btn-editar:hover {
-    background-color: #25bb25;
+    background-color: #1d84b4;
 }
 
 .gestion-container .btn-eliminar {
@@ -387,6 +404,10 @@ ul.messages li.error {
 
 .gestion-container .btn-eliminar:hover {
     background-color: #c0392b;
+}
+
+.gestion-container form {
+    display: inline-block;
 }
 
 .gestion-container form {
@@ -413,3 +434,66 @@ ul.messages li.error {
     padding: 10px;
     border-radius: 5px;
 }
+
+/* --- BOTONES DE NAVEGACIÓN --- */
+
+/* Botón: Mi Perfil */
+.btn-outline-accent {
+  color: #30e333;
+  border: 1px solid #30e333;
+  background: transparent;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 400;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-accent:hover {
+  color: #000;
+  background: #30e333;
+  box-shadow: 0 4px 8px rgba(48, 227, 51, 0.3);
+  transform: translateY(-2px);
+}
+
+.btn-outline-accent:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(48, 227, 51, 0.3);
+}
+
+/* Botón: Cerrar Sesión */
+.btn-adn-danger {
+  color: #fff;
+  background: #dc3545;
+  border: 1px solid #dc3545;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 400;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.btn-adn-danger:hover {
+  background: #c82333;
+  border-color: #c82333;
+  box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+  transform: translateY(-2px);
+}
+
+.btn-adn-danger:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.3);
+}
+
+.btn-adn-danger:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
+}
+
+/* Margen uniforme entre botones */
+.navbar-nav .nav-item .btn {
+  margin: 0 2px;
+}
+

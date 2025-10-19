@@ -6,147 +6,136 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrarse - Gimnasio ADN-FIT</title>
     <link href="{% static 'vendor/css/bootstrap.min.css' %}" rel="stylesheet">
-    <style>
-        body {
-            background-color: #000000;
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .register-container {
-            background-color: #000000;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
-            width: 100%;
-            max-width: 500px;
-            text-align: center;
-            border: 1px solid #30e333;
-            margin: 20px;
-        }
-        
-        .logo {
-            margin-bottom: 25px;
-        }
-        
-        .logo img {
-            max-width: 70px;
-            height: auto;
-            box-shadow: 0 5px 15px rgba(48, 227, 51, 0.4);
-        }
-        
-        .register-container h2 {
-            color: #30e333;
-            margin-bottom: 30px;
-            font-size: 2.2em;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-        
-        .form-field {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-        
-        .form-field label {
-            display: block;
-            margin-bottom: 8px;
-            color: #f0f0f0;
-            font-weight: bold;
-        }
-        
-        .form-field input,
-        .form-field select {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #555;
-            border-radius: 6px;
-            background-color: #2a2a2a;
-            color: #f0f0f0;
-            font-size: 16px;
-            box-sizing: border-box;
-        }
-        
-        .form-field input:focus,
-        .form-field select:focus {
-            outline: none;
-            border-color: #30e333;
-            box-shadow: 0 0 5px rgba(48, 227, 51, 0.5);
-        }
-        
-        .form-submit-btn {
-            width: 100%;
-            padding: 15px;
-            background-color: #30e333;
-            color: #1a1a1a;
-            border: none;
-            border-radius: 6px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .form-submit-btn:hover {
-            background-color: #28b82d;
-            transform: translateY(-2px);
-        }
-        
-        .messages-container {
-            margin-bottom: 20px;
-        }
-        
-        .message-error {
-            background-color: #dc3545;
-            color: white;
-            padding: 10px;
-            border-radius: 6px;
-            margin: 5px 0;
-            font-size: 14px;
-        }
-        
-        .message-success {
-            background-color: #28a745;
-            color: white;
-            padding: 10px;
-            border-radius: 6px;
-            margin: 5px 0;
-            font-size: 14px;
-        }
-        
-        .help-text {
-            color: #ccc;
-            font-size: 12px;
-            margin-top: 5px;
-            margin-bottom: 0;
-        }
-        
-        .links {
-            margin-top: 20px;
-        }
-        
-        .links a {
-            color: #30e333;
-            text-decoration: none;
-            font-size: 14px;
-        }
-        
-        .links a:hover {
-            text-decoration: underline;
-        }
-        
-        /* Estilo especial para campo oculto del rol */
-        input[type="hidden"] {
-            display: none;
-        }
-    </style>
+<style>
+    body {
+        background-color: #ffffff;
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .register-container {
+        background-color: #0d0d0d;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+        width: 100%;
+        max-width: 360px; /* 🔹 Más chico */
+        text-align: center;
+        border: 1px solid #30e333;
+        margin: 20px;
+    }
+
+    .logo {
+        margin-bottom: 15px;
+    }
+
+    .logo img {
+        max-width: 60px; /* 🔹 Tamaño más equilibrado */
+        height: auto;
+        box-shadow: 0 4px 10px rgba(48, 227, 51, 0.4);
+    }
+
+    .register-container h2 {
+        color: #30e333;
+        margin-bottom: 20px;
+        font-size: 1.7em; /* 🔹 Más chico pero más definido */
+        font-weight: bold;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    .form-field {
+        margin-bottom: 15px;
+        text-align: left;
+    }
+
+    .form-field label {
+        display: block;
+        margin-bottom: 6px;
+        color: #e8e8e8; /* 🔹 Más legible */
+        font-weight: bold;
+        font-size: 0.9em;
+    }
+
+    .form-field input,
+    .form-field select {
+        width: 100%;
+        padding: 10px 12px;
+        border: 2px solid #444;
+        border-radius: 6px;
+        background-color: #1f1f1f;
+        color: #f0f0f0;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+
+    .form-field input:focus,
+    .form-field select:focus {
+        outline: none;
+        border-color: #30e333;
+        box-shadow: 0 0 4px rgba(48, 227, 51, 0.4);
+    }
+
+    .help-text {
+        color: #aaa; /* 🔹 Menos brillo */
+        font-size: 11px;
+        margin-top: 4px;
+    }
+
+    .message-error {
+        background-color: #dc3545;
+        color: white;
+        padding: 8px;
+        border-radius: 6px;
+        margin: 5px 0;
+        font-size: 13px;
+    }
+
+    .form-submit-btn {
+        width: 100%;
+        padding: 12px;
+        background-color: #30e333;
+        color: #000;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 5px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .form-submit-btn:hover {
+        background-color: #28b82d;
+        transform: translateY(-2px);
+    }
+
+    .links {
+        margin-top: 15px;
+    }
+
+    .links a {
+        color: #30e333;
+        text-decoration: none;
+        font-size: 0.9em;
+    }
+
+    .links a:hover {
+        text-decoration: underline;
+    }
+
+    /* Ocultar campo rol si existe */
+    input[type="hidden"] {
+        display: none;
+    }
+</style>
+
 </head>
 <body>
     <div class="register-container">

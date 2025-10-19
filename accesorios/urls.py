@@ -7,6 +7,15 @@ urlpatterns = [
     # Proceso de consulta/listado
     path('inventario/', views.inventario_list, name='inventario_list'),
     
+    # Proceso de agregar nuevo accesorio
+    path('crear/', views.accesorio_create, name='accesorio_create'),
+    
+    # Proceso de editar accesorio existente
+    path('editar/<int:pk>/', views.accesorio_update, name='accesorio_update'),
+    
+    # Proceso de eliminar accesorio
+    path('eliminar/<int:pk>/', views.accesorio_delete, name='accesorio_delete'),
+    
     # Proceso de reportar faltante (Crear reporte)
     path('reportar/', views.reporte_faltante_create, name='reporte_faltante_create'),
     

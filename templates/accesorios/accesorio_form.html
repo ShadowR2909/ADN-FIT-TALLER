@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>
+        {% if accesorio %}
+            <i class="fas fa-edit me-2"></i>{{ page_title }}
+        {% else %}
+            <i class="fas fa-plus-circle me-2"></i>{{ page_title }}
+        {% endif %}
+    </h2>
+    <a href="{% url 'accesorios:inventario_list' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left me-1"></i>Volver al Inventario
+    </a>
+</div>
+
+<div class="form-container-card">
+    <p class="text-muted mb-4">
+        <i class="fas fa-info-circle me-1"></i>
+        {% if accesorio %}
+            Edite la información del accesorio "{{ accesorio.nombre }}" en el inventario del gimnasio.
+        {% else %}
+            Complete la información del nuevo accesorio que desea agregar al inventario del gimnasio.
+        {% endif %}
+    </p>
+
+    <form method="post" class="needs-validation" novalidate>
+        {% csrf_token %}
+
+        {# Campo Nombre #}
+        <div class="mb-3">
+            <label for="{{ form.nombre.id_for_label }}" class="form-label">
+                <i class="fas fa-tag me-1"></i>{{ form.nombre.label }}
+            </label>
+            {% render_field form.nombre class+="form-control" %}
+            {% for error in form.nombre.errors %}
+                <div class="text-danger small mt-1">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        {# Campo Cantidad Inicial #}
+        <div class="mb-3">
+            <label for="{{ form.cantidad_total.id_for_label }}" class="form-label">
+                <i class="fas fa-boxes me-1"></i>{{ form.cantidad_total.label }}
+            </label>
+            {% render_field form.cantidad_total class+="form-control" %}
+            <div class="form-text">
+                <i class="fas fa-lightbulb me-1"></i>
+                {% if accesorio %}
+                    Cantidad actual en el inventario
+                {% else %}
+                    Ingrese la cantidad inicial que se agregará al inventario
+                {% endif %}
+            </div>
+            {% for error in form.cantidad_total.errors %}
+                <div class="text-danger small mt-1">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        {# Campo Descripción #}
+        <div class="mb-4">
+            <label for="{{ form.descripcion.id_for_label }}" class="form-label">
+                <i class="fas fa-align-left me-1"></i>{{ form.descripcion.label }}
+            </label>
+            {% render_field form.descripcion class+="form-control" %}
+            <div class="form-text">
+                Agregue información adicional sobre el accesorio (peso, material, uso recomendado, etc.)
+            </div>
+            {% for error in form.descripcion.errors %}
+                <div class="text-danger small mt-1">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <hr class="my-4">
+
+        <div class="d-flex gap-2">
+            {% if accesorio %}
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-save me-1"></i>Guardar Cambios
+                </button>
+            {% else %}
+                <button type="submit" class="btn btn-success btn-lg">
+                    <i class="fas fa-plus-circle me-1"></i>Agregar Accesorio
+                </button>
+            {% endif %}
+            <a href="{% url 'accesorios:inventario_list' %}" class="btn btn-secondary btn-lg">
+                <i class="fas fa-times me-1"></i>Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+{# Script para validación del formulario #}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('.needs-validation');
+    const nombreInput = document.getElementById('{{ form.nombre.id_for_label }}');
+    const cantidadInput = document.getElementById('{{ form.cantidad_total.id_for_label }}');
+    
+    // Validación en tiempo real
+    nombreInput.addEventListener('input', function() {
+        if (this.value.trim().length < 2) {
+            this.setCustomValidity('El nombre debe tener al menos 2 caracteres');
+            this.classList.add('is-invalid');
+        } else {
+            this.setCustomValidity('');
+            this.classList.remove('is-invalid');
+            this.classList.add('is-valid');
+        }
+    });
+    
+    cantidadInput.addEventListener('input', function() {
+        if (this.value < 0) {
+            this.setCustomValidity('La cantidad no puede ser negativa');
+            this.classList.add('is-invalid');
+        } else {
+            this.setCustomValidity('');
+            this.classList.remove('is-invalid');
+            this.classList.add('is-valid');
+        }
+    });
+    
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    });
+});
+</script>
+{% endblock content %}

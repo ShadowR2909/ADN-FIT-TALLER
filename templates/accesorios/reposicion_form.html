@@ -6,14 +6,15 @@
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Procesar Reposición de Stock</h1>
+    {% block content %}
+    <h2>Procesar Reposición de Stock</h2>
     <a href="{% url 'accesorios:reportes_pendientes' %}" class="btn btn-secondary">
         Volver a Reportes
     </a>
 </div>
 
 <div class="form-container-card">
-    <h3 class="text-accent mb-4">Artículo a Reponer: {{ reporte.accesorio.nombre }}</h3>
+    <h2 class="text-accent mb-4">Artículo a Reponer: {{ reporte.accesorio.nombre }}</h2>
 
     <div class="alert alert-info">
         <p>Reporte ID: **{{ reporte.pk }}**</p>

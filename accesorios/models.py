@@ -1,14 +1,21 @@
 from django.db import models
 from django.conf import settings
 from django.core.validators import MinValueValidator
+from django.utils import timezone
 
 User = settings.AUTH_USER_MODEL
 
-# 1. Accesorio primero
+# 1. Accesorio con campos de auditoría
 class Accesorio(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
     cantidad_total = models.PositiveIntegerField(default=0, verbose_name="Cantidad en Inventario")
     descripcion = models.TextField(blank=True, null=True)
+    
+    # Campos de auditoría
+    creado_por = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='accesorios_creados')
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    modificado_por = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='accesorios_modificados')
+    fecha_modificacion = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name_plural = "Accesorios"
@@ -16,6 +23,29 @@ class Accesorio(models.Model):
 
     def __str__(self):
         return f"{self.nombre} ({self.cantidad_total} en stock)"
+
+# 1.1. Historial de Acciones de Accesorios
+class HistorialAccesorio(models.Model):
+    ACCIONES = [
+        ('CREADO', 'Accesorio Creado'),
+        ('EDITADO', 'Accesorio Editado'),
+        ('ELIMINADO', 'Accesorio Eliminado'),
+    ]
+    
+    accesorio_nombre = models.CharField(max_length=100)  # Guardamos el nombre por si se elimina
+    accesorio_id = models.PositiveIntegerField(null=True, blank=True)  # ID original del accesorio
+    accion = models.CharField(max_length=20, choices=ACCIONES)
+    usuario = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    fecha = models.DateTimeField(auto_now_add=True)
+    detalles = models.TextField(blank=True, null=True)  # Información adicional sobre la acción
+    
+    class Meta:
+        verbose_name = "Historial de Accesorio"
+        verbose_name_plural = "Historial de Accesorios"
+        ordering = ['-fecha']
+    
+    def __str__(self):
+        return f"{self.accion} - {self.accesorio_nombre} por {self.usuario} ({self.fecha})"
 
 # 2. ReporteFaltante
 class ReporteFaltante(models.Model):

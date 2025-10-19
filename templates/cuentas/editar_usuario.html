@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h1>Editar Usuario: {{ usuario_a_editar.username }}</h1>
+    <h2>Editar Usuario: {{ usuario_a_editar.username }}</h2>
 
     <form method="POST">
     {% csrf_token %}
