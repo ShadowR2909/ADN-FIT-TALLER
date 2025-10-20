@@ -7,6 +7,15 @@ urlpatterns = [
     # Proceso de consulta/listado
     path('inventario/', views.inventario_list, name='inventario_list'),
     
+    # Proceso de agregar nuevo accesorio
+    path('crear/', views.accesorio_create, name='accesorio_create'),
+    
+    # Proceso de editar accesorio existente
+    path('editar/<int:pk>/', views.accesorio_update, name='accesorio_update'),
+    
+    # Proceso de eliminar accesorio
+    path('eliminar/<int:pk>/', views.accesorio_delete, name='accesorio_delete'),
+    
     # Proceso de reportar faltante (Crear reporte)
     path('reportar/', views.reporte_faltante_create, name='reporte_faltante_create'),
     
@@ -19,5 +28,10 @@ urlpatterns = [
     # Historial de reportes y reposiciones
     path('reportes/historial/', views.historial_accesorios, name='historial_accesorios'),
 
+<<<<<<< HEAD
+=======
+    path('inventario/inactivos/', views.inventario_inactivos, name='inventario_inactivos'),
+    path('accesorio/reactivar/<int:pk>/', views.accesorio_reactivar, name='accesorio_reactivar'),
+>>>>>>> 34487de0ffefc5d1361982c210e4596e0410ff2d
 
 ]

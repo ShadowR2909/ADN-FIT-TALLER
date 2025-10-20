@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Eliminar Accesorio{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Eliminar Accesorio
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-warning me-2"></i>
+                        <strong>¡Atención!</strong> Esta acción no se puede deshacer.
+                    </div>
+                    
+                    <h5>¿Estás seguro que deseas eliminar este accesorio?</h5>
+                    
+                    <div class="bg-light p-3 rounded my-3">
+                        <h6><strong>Nombre:</strong> {{ accesorio.nombre }}</h6>
+                        <p><strong>Cantidad en Stock:</strong> {{ accesorio.cantidad_total }} unidades</p>
+                        {% if accesorio.descripcion %}
+                            <p><strong>Descripción:</strong> {{ accesorio.descripcion }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    {% if reportes_asociados > 0 %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Información:</strong> Este accesorio tiene {{ reportes_asociados }} reporte{{ reportes_asociados|pluralize }} asociado{{ reportes_asociados|pluralize }}. Al eliminarlo, se mantendrá el historial de reportes pero no se podrán crear nuevos reportes para este accesorio.
+                        </div>
+                    {% endif %}
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% url 'accesorios:inventario_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>Cancelar
+                        </a>
+                        
+                        <form method="post" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-1"></i>Sí, Eliminar
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
