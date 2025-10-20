@@ -28,5 +28,7 @@ urlpatterns = [
     # Historial de reportes y reposiciones
     path('reportes/historial/', views.historial_accesorios, name='historial_accesorios'),
 
+    path('inventario/inactivos/', views.inventario_inactivos, name='inventario_inactivos'),
+    path('accesorio/reactivar/<int:pk>/', views.accesorio_reactivar, name='accesorio_reactivar'),
 
 ]
