@@ -10,8 +10,6 @@ class Accesorio(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
     cantidad_total = models.PositiveIntegerField(default=0, verbose_name="Cantidad en Inventario")
     descripcion = models.TextField(blank=True, null=True)
-<<<<<<< HEAD
-=======
     
     # Soft delete
     activo = models.BooleanField(default=True)  # <--- esto es lo nuevo
@@ -22,7 +20,6 @@ class Accesorio(models.Model):
     modificado_por = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='accesorios_modificados')
     fecha_modificacion = models.DateTimeField(auto_now=True)
 
->>>>>>> 34487de0ffefc5d1361982c210e4596e0410ff2d
 
     class Meta:
         verbose_name_plural = "Accesorios"
@@ -31,9 +28,6 @@ class Accesorio(models.Model):
     def __str__(self):
         return f"{self.nombre} ({self.cantidad_total} en stock)"
 
-<<<<<<< HEAD
-# 2. ReporteFaltante
-=======
 
 class HistorialAccesorio(models.Model):
     ACCIONES = [
@@ -57,17 +51,12 @@ class HistorialAccesorio(models.Model):
         return f"{self.accion} - {self.accesorio_nombre} por {self.usuario} ({self.fecha})"
 
 
->>>>>>> 34487de0ffefc5d1361982c210e4596e0410ff2d
 class ReporteFaltante(models.Model):
     ESTADOS = [
         ('PENDIENTE', 'Pendiente de Confirmación'),
         ('CONFIRMADO', 'Confirmado (Requiere Compra)'),
         ('DESCARTADO', 'Descartado por Empleado/Admin'),
     ]
-<<<<<<< HEAD
-
-=======
->>>>>>> 34487de0ffefc5d1361982c210e4596e0410ff2d
     accesorio = models.ForeignKey('Accesorio', on_delete=models.CASCADE)
     cantidad_faltante = models.PositiveIntegerField(validators=[MinValueValidator(1)])
     fecha_reporte = models.DateTimeField(auto_now_add=True)
@@ -84,11 +73,6 @@ class ReporteFaltante(models.Model):
     def __str__(self):
         return f"Reporte #{self.id} de {self.accesorio.nombre} - {self.estado}"
 
-<<<<<<< HEAD
-# 3. Reposicion
-=======
-
->>>>>>> 34487de0ffefc5d1361982c210e4596e0410ff2d
 class Reposicion(models.Model):
     reporte = models.OneToOneField('ReporteFaltante', on_delete=models.CASCADE, related_name='reposicion')
     cantidad_comprada = models.PositiveIntegerField(default=0, verbose_name="Cantidad de unidades compradas")

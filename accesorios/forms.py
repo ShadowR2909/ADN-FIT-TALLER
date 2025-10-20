@@ -22,8 +22,6 @@ class ReposicionForm(forms.ModelForm):
         fields = ['cantidad_comprada']
 
 # ------------------------
-<<<<<<< HEAD
-=======
 # NUEVO: Formulario para crear nuevos accesorios
 class AccesorioForm(forms.ModelForm):
     class Meta:
@@ -52,7 +50,6 @@ class AccesorioForm(forms.ModelForm):
         }
 
 # ------------------------
->>>>>>> 34487de0ffefc5d1361982c210e4596e0410ff2d
 # NUEVO: Formulario para ajustar inventario manualmente
 class AjusteInventarioForm(forms.ModelForm):
     comentario = forms.CharField(
@@ -66,8 +63,4 @@ class AjusteInventarioForm(forms.ModelForm):
         fields = ['cantidad_total']
         widgets = {
             'cantidad_total': forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
-<<<<<<< HEAD
         }
-=======
-        }
->>>>>>> 34487de0ffefc5d1361982c210e4596e0410ff2d

@@ -6,31 +6,6 @@ from .forms import ReporteFaltanteForm, ReposicionForm, AccesorioForm
 from django.utils import timezone
 from django.contrib.auth.mixins import UserPassesTestMixin
 
-<<<<<<< HEAD
-# Mixin de verificación de rol (Asumiendo que 'Entrenador' o 'Administrador' son Staff)
-class StaffRequiredMixin(UserPassesTestMixin):
-    def test_func(self):
-        # Asumiendo que el campo 'rol' está en user.profile
-        return self.request.user.is_authenticated and (
-            self.request.user.profile.rol in ['Entrenador', 'Administrador']
-        )
-# NUEVO: Historial completo de accesorios (reportes y reposiciones)
-@login_required
-def historial_accesorios(request):
-    """Muestra todos los reportes y reposiciones, con quién y cuándo se realizaron."""
-    reportes = ReporteFaltante.objects.all().select_related('accesorio', 'empleado_reporte', 'empleado_confirmacion')
-    reposiciones = Reposicion.objects.all().select_related('reporte', 'administrador')
-    
-    context = {
-        'reportes': reportes,
-        'reposiciones': reposiciones,
-        'page_title': 'Historial de Accesorios',
-    }
-    return render(request, 'accesorios/historial_accesorios.html', context)
-
-
-=======
->>>>>>> 34487de0ffefc5d1361982c210e4596e0410ff2d
 
 # ------------------------------
 # HISTORIAL DE ACCESORIOS
@@ -85,34 +60,21 @@ def reportes_pendientes_list(request):
 def reporte_confirmar(request, pk):
     reporte = get_object_or_404(ReporteFaltante, pk=pk)
 
-<<<<<<< HEAD
-=======
     if not hasattr(request.user, 'profile') or request.user.profile.rol != 'Administrador':
         messages.error(request, "Permiso denegado: solo los Administradores pueden confirmar o descartar reportes.")
         return redirect('accesorios:reportes_pendientes')
 
->>>>>>> 34487de0ffefc5d1361982c210e4596e0410ff2d
     if request.method == 'POST':
         accion = request.POST.get('accion')
 
         if accion == 'confirmar':
             reporte.estado = 'CONFIRMADO'
-<<<<<<< HEAD
-            # Descontamos del stock del accesorio
-=======
->>>>>>> 34487de0ffefc5d1361982c210e4596e0410ff2d
             accesorio = reporte.accesorio
             if accesorio.cantidad_total >= reporte.cantidad_faltante:
                 accesorio.cantidad_total -= reporte.cantidad_faltante
             else:
-<<<<<<< HEAD
-                accesorio.cantidad_total = 0  # Por si la cantidad faltante es mayor
-            accesorio.save()
-
-=======
                 accesorio.cantidad_total = 0
             accesorio.save()
->>>>>>> 34487de0ffefc5d1361982c210e4596e0410ff2d
             messages.success(request, f'Reporte de {accesorio.nombre} confirmado. Stock actualizado.')
 
         elif accion == 'descartar':
@@ -126,20 +88,9 @@ def reporte_confirmar(request, pk):
 
     return redirect('accesorios:reportes_pendientes')
 
-<<<<<<< HEAD
-
-
-# 4. GESTIÓN DE REPOSICIÓN (Flujo de Compra/Actualización de Stock)
-class AdminRequiredMixin(UserPassesTestMixin):
-    """Mixin que solo permite el acceso a usuarios con rol 'Administrador'."""
-    def test_func(self):
-        return self.request.user.is_authenticated and self.request.user.profile.rol == 'Administrador'
-
-=======
 # ------------------------------
 # REPOSICIÓN DE STOCK
 # ------------------------------
->>>>>>> 34487de0ffefc5d1361982c210e4596e0410ff2d
 @login_required
 def reposicion_create(request, pk):
     reporte = get_object_or_404(ReporteFaltante, pk=pk, estado='CONFIRMADO')
