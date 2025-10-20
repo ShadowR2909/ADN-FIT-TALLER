@@ -1,39 +1,172 @@
-{% extends 'base.html' %}
 {% load static %}
-{% load widget_tweaks %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Gimnasio ADN-FIT</title>
+    <link href="{% static 'vendor/css/bootstrap.min.css' %}" rel="stylesheet">
+    <style>
+    body {
+        background-color: #ffffff;
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-{% block title %}Iniciar Sesión{% endblock %}
+    .login-container {
+        background-color: #1a1a1a;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+        width: 100%;
+        max-width: 350px; /* 🔹 Reducido de 450px a 350px */
+        text-align: center;
+        border: 1px solid #30e333;
+    }
 
-{% block content %}
-<div class="auth-card">
-    <div class="logo">
-        <img src="{% static 'img/logo-gym.png' %}" alt="Logo ADN-FIT">
-    </div>
-    <h2 class="text-accent">INICIAR SESIÓN</h2>
-    
-    {# Mensajes, si los hay #}
+    .logo {
+        margin-bottom: 15px;
+    }
 
-    <form method="post">
-        {% csrf_token %}
-        
-        {# CAMPO USUARIO: Eliminamos 'visually-hidden' #}
-        <div class="mb-3">
-            <label for="{{ form.username.id_for_label }}" class="form-label">Usuario</label>
-            {{ form.username|add_class:"form-control" }}
+    .logo img {
+        max-width: 55px; /* 🔹 Más chico el logo */
+        height: auto;
+        box-shadow: 0 4px 10px rgba(48, 227, 51, 0.4);
+    }
+
+    .login-container h2 {
+        color: #30e333;
+        margin-bottom: 20px;
+        font-size: 1.6em; /* 🔹 Reducido */
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    .form-field {
+        margin-bottom: 15px;
+        text-align: left;
+    }
+
+    .form-field label {
+        display: block;
+        margin-bottom: 6px;
+        color: #f0f0f0;
+        font-weight: bold;
+        font-size: 0.9em; /* 🔹 Más pequeño */
+    }
+
+    .form-field input {
+        width: 100%;
+        padding: 10px 12px;
+        border: 2px solid #555;
+        border-radius: 6px;
+        background-color: #2a2a2a;
+        color: #f0f0f0;
+        font-size: 14px; /* 🔹 Reducido */
+        box-sizing: border-box;
+    }
+
+    .form-field input:focus {
+        outline: none;
+        border-color: #30e333;
+        box-shadow: 0 0 4px rgba(48, 227, 51, 0.5);
+    }
+
+    .form-submit-btn {
+        width: 100%;
+        padding: 12px;
+        background-color: #30e333;
+        color: #1a1a1a;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .form-submit-btn:hover {
+        background-color: #28b82d;
+        transform: translateY(-2px);
+    }
+
+    .messages {
+        list-style: none;
+        padding: 0;
+        margin: 15px 0;
+    }
+
+    .messages li {
+        padding: 8px;
+        border-radius: 6px;
+        margin-bottom: 8px;
+        background-color: #dc3545;
+        color: white;
+        font-size: 0.9em;
+    }
+
+    .links {
+        margin-top: 15px;
+    }
+
+    .links p {
+        color: #ccc;
+        margin: 0;
+        font-size: 0.9em;
+    }
+
+    .links a {
+        color: #30e333;
+        text-decoration: none;
+    }
+
+    .links a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <img src="{% static 'img/logo-gym.png' %}" alt="Logo">
         </div>
+        <h2>INICIAR SESIÓN</h2>
         
-        {# CAMPO CONTRASEÑA: Eliminamos 'visually-hidden' #}
-        <div class="mb-3">
-            <label for="{{ form.password.id_for_label }}" class="form-label">Contraseña</label>
-            {{ form.password|add_class:"form-control" }}
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-field">
+                <label for="id_username">Usuario:</label>
+                <input type="text" name="username" id="id_username" required>
+            </div>
+            
+            <div class="form-field">
+                <label for="id_password">Contraseña:</label>
+                <input type="password" name="password" id="id_password" required>
+            </div>
+            
+            <button type="submit" class="form-submit-btn">Entrar</button>
+        </form>
+        
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li class="{{ message.tags }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        <div class="links">
+            <p>¿No tienes cuenta? <a href="{% url 'register' %}">Regístrate aquí</a></p>
         </div>
-        
-        {# Botón Entrar: #}
-        <button type="submit" class="btn btn-primary w-100 mt-4">Entrar</button>
-    </form>
-    
-    <div class="links mt-4">
-        ¿No tienes cuenta? <a href="{% url 'register' %}">Regístrate aquí</a>
     </div>
-</div>
-{% endblock content %}
+</body>
+</html>

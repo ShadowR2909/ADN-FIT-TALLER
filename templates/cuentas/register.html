@@ -4,24 +4,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registrarse - ADN Fitness</title>
-    <link rel="stylesheet" href="{% static 'css/gimnasio.css' %}">
+    <title>Registrarse - Gimnasio ADN-FIT</title>
+    <link href="{% static 'vendor/css/bootstrap.min.css' %}" rel="stylesheet">
+<style>
+    body {
+        background-color: #ffffff;
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .register-container {
+        background-color: #0d0d0d;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+        width: 100%;
+        max-width: 360px; /* 🔹 Más chico */
+        text-align: center;
+        border: 1px solid #30e333;
+        margin: 20px;
+    }
+
+    .logo {
+        margin-bottom: 15px;
+    }
+
+    .logo img {
+        max-width: 60px; /* 🔹 Tamaño más equilibrado */
+        height: auto;
+        box-shadow: 0 4px 10px rgba(48, 227, 51, 0.4);
+    }
+
+    .register-container h2 {
+        color: #30e333;
+        margin-bottom: 20px;
+        font-size: 1.7em; /* 🔹 Más chico pero más definido */
+        font-weight: bold;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    .form-field {
+        margin-bottom: 15px;
+        text-align: left;
+    }
+
+    .form-field label {
+        display: block;
+        margin-bottom: 6px;
+        color: #e8e8e8; /* 🔹 Más legible */
+        font-weight: bold;
+        font-size: 0.9em;
+    }
+
+    .form-field ul {
+    /* Los mensajes de ayuda de contraseña a menudo son listas */
+    color: #aaa; 
+    list-style-type: none; /* Eliminar viñetas, si existen */
+    padding-left: 0;
+    margin-top: 5px;
+    font-size: 12px;
+    }
+
+    .form-field ul li {
+        color: #aaa; /* Color brillante */
+        text-align: left;
+        margin-bottom: 2px;
+    }
+
+    .form-field input,
+    .form-field select {
+        width: 100%;
+        padding: 10px 12px;
+        border: 2px solid #444;
+        border-radius: 6px;
+        background-color: #1f1f1f;
+        color: #f0f0f0;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+
+    .form-field input:focus,
+    .form-field select:focus {
+        outline: none;
+        border-color: #30e333;
+        box-shadow: 0 0 4px rgba(48, 227, 51, 0.4);
+    }
+
+    .help-text {
+        color: #aaa; /* 🔹 Menos brillo */
+        font-size: 11px;
+        margin-top: 4px;
+    }
+
+    .message-error {
+        background-color: #dc3545;
+        color: white;
+        padding: 8px;
+        border-radius: 6px;
+        margin: 5px 0;
+        font-size: 13px;
+    }
+
+    .form-submit-btn {
+        width: 100%;
+        padding: 12px;
+        background-color: #30e333;
+        color: #000;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 5px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .form-submit-btn:hover {
+        background-color: #28b82d;
+        transform: translateY(-2px);
+    }
+
+    .links {
+        margin-top: 15px;
+    }
+
+    .links a {
+        color: #30e333;
+        text-decoration: none;
+        font-size: 0.9em;
+    }
+
+    .links a:hover {
+        text-decoration: underline;
+    }
+
+    /* Ocultar campo rol si existe */
+    input[type="hidden"] {
+        display: none;
+    }
+</style>
+
 </head>
 <body>
-    
-    {% if messages %}
-        <div class="messages-container">
-            {% for message in messages %}
-                <p class="message-{{ message.tags }}">{{ message }}</p>
-            {% endfor %}
-        </div>
-    {% endif %}
-
-    <div class="auth-card">
+    <div class="register-container">
         <div class="logo">
-            <img src="{% static 'img/logo-gym.png' %}" alt="ADN Fitness Logo">
+            <img src="{% static 'img/logo-gym.png' %}" alt="Logo">
         </div>
         <h2>CREAR CUENTA</h2>
+        
+        {% if messages %}
+            <div class="messages-container">
+                {% for message in messages %}
+                    <p class="message-{{ message.tags }}">{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
 
         <form method="post">
             {% csrf_token %}
@@ -56,7 +200,7 @@
         </form>
         
         <div class="links">
-            <a href="{% url 'login' %}">¿YA TIENES UNA CUENTA? INICIA SESIÓN</a>
+            <a href="{% url 'login' %}">¿Ya tienes una cuenta? Inicia sesión</a>
         </div>
     </div>
 </body>

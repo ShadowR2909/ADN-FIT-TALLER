@@ -16,4 +16,8 @@ urlpatterns = [
 
     path('reposicion/crear/<int:pk>/', views.reposicion_create, name='reposicion_create'), 
 
+    # Historial de reportes y reposiciones
+    path('reportes/historial/', views.historial_accesorios, name='historial_accesorios'),
+
+
 ]

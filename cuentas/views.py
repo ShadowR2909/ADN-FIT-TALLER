@@ -133,56 +133,177 @@ def editar_perfil(request):
 
 @login_required
 @user_passes_test(es_administrador)
+@transaction.atomic
 def gestion_usuarios(request):
-    """Muestra lista de todos los usuarios (Solo Admin)."""
+    """Muestra lista de todos los usuarios (Solo Admin) y permite eliminar y crear."""
+    
+    if request.method == 'POST':
+        # Manejar eliminación de usuario
+        user_id = request.POST.get('eliminar_usuario_id')
+        if user_id:
+            usuario_a_eliminar = get_object_or_404(User, id=user_id)
+            if usuario_a_eliminar != request.user:  # Evita auto-eliminación
+                usuario_a_eliminar.delete()
+                messages.success(request, f"Usuario '{usuario_a_eliminar.username}' eliminado correctamente.")
+            else:
+                messages.error(request, "No puedes eliminar tu propio usuario.")
+            return redirect('gestion_usuarios')
+        
+        # Manejar creación de usuario
+        crear_usuario = request.POST.get('crear_usuario')
+        if crear_usuario:
+            try:
+                # Validar que las contraseñas coincidan
+                password1 = request.POST.get('password1')
+                password2 = request.POST.get('password2')
+                
+                if password1 != password2:
+                    messages.error(request, "Las contraseñas no coinciden.")
+                    return redirect('gestion_usuarios')
+                
+                if len(password1) < 8:
+                    messages.error(request, "La contraseña debe tener al menos 8 caracteres.")
+                    return redirect('gestion_usuarios')
+                
+                # Verificar que el username no exista
+                username = request.POST.get('username')
+                if User.objects.filter(username=username).exists():
+                    messages.error(request, f"El nombre de usuario '{username}' ya existe.")
+                    return redirect('gestion_usuarios')
+                
+                # Crear el usuario
+                user = User.objects.create_user(
+                    username=username,
+                    email=request.POST.get('email'),
+                    password=password1,
+                    first_name=request.POST.get('first_name', ''),
+                    last_name=request.POST.get('last_name', ''),
+                    is_active=bool(request.POST.get('is_active'))
+                )
+                
+                # Crear o actualizar el perfil
+                profile, created = Profile.objects.get_or_create(user=user)
+                profile.rol = request.POST.get('rol', 'Socio')
+                profile.telefono = request.POST.get('telefono', '')
+                profile.save()
+                
+                messages.success(request, f"Usuario '{username}' creado exitosamente como {profile.rol}.")
+                
+            except Exception as e:
+                messages.error(request, f"Error al crear el usuario: {str(e)}")
+            
+            return redirect('gestion_usuarios')
+    
     usuarios = User.objects.all().order_by('username')
     return render(request, 'cuentas/gestion_usuarios.html', {'usuarios': usuarios})
 
 @login_required
 @user_passes_test(es_entrenador)
+@transaction.atomic
 def lista_alumnos(request):
-    """Muestra solo usuarios con rol 'Socio'."""
-    socios = User.objects.filter(profile__rol='Socio').order_by('last_name')
+    """Muestra solo usuarios con rol 'socio' y permite crear nuevos socios."""
+    
+    if request.method == 'POST':
+        crear_socio = request.POST.get('crear_socio')
+        if crear_socio:
+            try:
+                # Validar que las contraseñas coincidan
+                password1 = request.POST.get('password1')
+                password2 = request.POST.get('password2')
+                
+                if password1 != password2:
+                    messages.error(request, "Las contraseñas no coinciden.")
+                    return redirect('lista_alumnos')
+                
+                if len(password1) < 8:
+                    messages.error(request, "La contraseña debe tener al menos 8 caracteres.")
+                    return redirect('lista_alumnos')
+                
+                # Verificar que el username no exista
+                username = request.POST.get('username')
+                if User.objects.filter(username=username).exists():
+                    messages.error(request, f"El nombre de usuario '{username}' ya existe.")
+                    return redirect('lista_alumnos')
+                
+                # Verificar campos obligatorios
+                first_name = request.POST.get('first_name')
+                last_name = request.POST.get('last_name')
+                if not first_name or not last_name:
+                    messages.error(request, "El nombre y apellido son obligatorios.")
+                    return redirect('lista_alumnos')
+                
+                # Crear el usuario
+                user = User.objects.create_user(
+                    username=username,
+                    email=request.POST.get('email'),
+                    password=password1,
+                    first_name=first_name,
+                    last_name=last_name,
+                    is_active=True  # Los socios están activos por defecto
+                )
+                
+                # Crear el perfil como Socio
+                profile, created = Profile.objects.get_or_create(user=user)
+                profile.rol = 'Socio'  # Forzar rol como Socio
+                profile.telefono = request.POST.get('telefono', '')
+                profile.save()
+                
+                messages.success(request, f"¡Alumno '{first_name} {last_name}' registrado exitosamente! Username: {username}")
+                
+            except Exception as e:
+                messages.error(request, f"Error al crear el alumno: {str(e)}")
+            
+            return redirect('lista_alumnos')
+    
+    socios = User.objects.filter(profile__rol__iexact='socio').order_by('last_name', 'first_name')
     return render(request, 'cuentas/lista_alumnos.html', {'socios': socios})
+
 
 @login_required
 @user_passes_test(es_administrador)
 @transaction.atomic
 def editar_usuario_view(request, user_id):
-    """Permite al Administrador editar un usuario (incluyendo el rol)."""
+    """Permite al Administrador editar un usuario (incluyendo el rol y estado activo)."""
     usuario_a_editar = get_object_or_404(User, id=user_id)
     profile = get_object_or_404(Profile, user=usuario_a_editar)
-    
+
     if request.method == 'POST':
-        # 🚨 USAMOS AdminProfileForm: Este formulario SÍ incluye el campo 'rol'. 🚨
-        profile_form = AdminProfileForm(request.POST, instance=profile) 
-        
-        # --- Lógica para el estado is_active (campo del modelo User) ---
-        is_active_new_status = request.POST.get('is_active')
-        usuario_a_editar.is_active = (is_active_new_status == 'on') 
-        # ----------------------------------------
-        
+        profile_form = AdminProfileForm(request.POST, instance=profile)
+
         if profile_form.is_valid():
+            # Guardamos primero el Profile
             profile_form.save()
-            
-            # Guardamos el estado activo/inactivo en el objeto User
-            usuario_a_editar.save() 
-            
-            messages.success(request, f"Usuario '{usuario_a_editar.username}' actualizado exitosamente. Estado Activo: {usuario_a_editar.is_active}")
-            return redirect('gestion_usuarios')
+
+            # Guardamos campos del User
+            usuario_a_editar.username = request.POST.get('username', usuario_a_editar.username)
+            usuario_a_editar.first_name = request.POST.get('first_name', usuario_a_editar.first_name)
+            usuario_a_editar.last_name = request.POST.get('last_name', usuario_a_editar.last_name)
+            usuario_a_editar.email = request.POST.get('email', usuario_a_editar.email)
+
+            # Guardar estado activo
+            is_active_new_status = request.POST.get('is_active')
+            usuario_a_editar.is_active = (is_active_new_status == 'on')
+
+            usuario_a_editar.save()  # Guardamos cambios en User
+
+            messages.success(request, f"Usuario '{usuario_a_editar.username}' actualizado exitosamente.")
+            return redirect('gestion_usuarios')  # sin namespace
+
         else:
             messages.error(request, "Error al actualizar el usuario. Revisa el formulario.")
+
     else:
-        # Inicializamos con AdminProfileForm para mostrar el campo 'rol'
         profile_form = AdminProfileForm(instance=profile)
-        
+
     context = {
         'usuario_a_editar': usuario_a_editar,
         'profile_form': profile_form,
         'titulo': f'Editar Usuario: {usuario_a_editar.username}'
     }
-    
+
     return render(request, 'cuentas/editar_usuario.html', context)
+
+    
 
 @login_required
 @user_passes_test(es_entrenador)

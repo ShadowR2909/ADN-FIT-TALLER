@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %} {# Carga la librería widget_tweaks para mayor control sobre el renderizado de campos #}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{{ page_title }}</h1>
+        {# Enlace para volver al listado de socios (asumiendo que viene de ahí) #}
+        <a href="{% url 'gestion:socio_list' %}" class="btn btn-secondary">
+            Volver a Socios
+        </a>
+    </div>
+
+    <div class="card p-4 shadow-sm">
+        {# Usando clases de color personalizadas ('text-adn-edit', 'btn-adn-edit') #}
+        <h3 class="card-title text-adn-edit mb-4">Detalles de la Nueva Suscripción</h3>
+
+        <form method="post" class="needs-validation" novalidate>
+            {% csrf_token %}
+
+            {# Lógica para mostrar el socio si ya está pre-seleccionado (ej. al crearse desde la página del socio) #}
+            {% if form.socio.initial %}
+            <div class="alert alert-info">
+                Asignando membresía al socio: **{{ form.socio.initial.username }}** (ID: {{ form.socio.initial.pk }})
+                {# Campo oculto para enviar el ID del socio con el formulario #}
+                <input type="hidden" name="{{ form.socio.html_name }}" value="{{ form.socio.initial.pk }}">
+            </div>
+            {% else %}
+            {# Si no está pre-seleccionado, muestra el selector de socio (dropdown) #}
+            <div class="mb-3">
+                <label for="{{ form.socio.id_for_label }}" class="form-label fw-bold">{{ form.socio.label }}</label>
+                {# Renderiza el campo con la clase 'form-control' de Bootstrap usando widget_tweaks #}
+                {% render_field form.socio class+="form-control" %}
+                {% for error in form.socio.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
+            {% endif %}
+
+            {# Campo para seleccionar el Plan #}
+            <div class="mb-3">
+                <label for="{{ form.plan.id_for_label }}" class="form-label fw-bold">{{ form.plan.label }}</label>
+                {% render_field form.plan class+="form-control" %}
+                {% for error in form.plan.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
+
+            <div class="row">
+                {# Campo de Fecha de Inicio #}
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.fecha_inicio.id_for_label }}" class="form-label fw-bold">{{ form.fecha_inicio.label }}</label>
+                    {% render_field form.fecha_inicio class+="form-control" %}
+                    {% for error in form.fecha_inicio.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                </div>
+
+                {# Campo de Pagada (Checkbox) #}
+                <div class="col-md-6 mb-3 form-check d-flex align-items-center mt-4 pt-2">
+                    {# El campo de checkbox se renderiza primero con la clase 'form-check-input' #}
+                    {% render_field form.pagada class+="form-check-input" %}
+                    {# La etiqueta se coloca después, con la clase 'form-check-label' #}
+                    <label for="{{ form.pagada.id_for_label }}" class="form-check-label fw-bold ms-2">{{ form.pagada.label }}</label>
+                    {% for error in form.pagada.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                </div>
+            </div>
+
+            <hr class="my-4">
+
+            <button type="submit" class="btn btn-adn-edit btn-lg me-2">
+                <i class="fas fa-save me-1"></i> Confirmar y Asignar Membresía
+            </button>
+            <a href="{% url 'gestion:socio_list' %}" class="btn btn-secondary btn-lg">
+                Cancelar
+            </a>
+        </form>
+    </div>
+</div>
+{% endblock content %}

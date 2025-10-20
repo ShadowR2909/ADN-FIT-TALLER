@@ -7,7 +7,7 @@
 <div class="container mt-4">
     <div class="row mb-4">
         <div class="col-12">
-            <h1 class="text-white">Mi Rutina de Entrenamiento</h1>
+            <h2 class="text-white">Mi Rutina de Entrenamiento</h2>
             <p class="lead text-white-50">Consulta tu plan de ejercicios personalizado asignado por tu Entrenador.</p>
         </div>
     </div>
@@ -18,7 +18,7 @@
         
         <div class="card p-4 bg-dark text-white shadow">
             
-            <h2 class="text-info">{{ rutina_activa.nombre }}</h2>
+            <h3 class="text-info">{{ rutina_activa.nombre }}</h3>
             <p class="text-white-50">Asignada por: <strong>{{ rutina_activa.entrenador.get_full_name|default:rutina_activa.entrenador.username }}</strong></p>
             <p class="text-white-50">Fecha de Asignación: {{ rutina_activa.fecha_asignacion|date:"d F Y" }}</p>
 

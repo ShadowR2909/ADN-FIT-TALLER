@@ -24,4 +24,8 @@ urlpatterns = [
     path("alumnos/", views.lista_alumnos, name="lista_alumnos"),
     path("asignar-rutinas/", views.asignar_rutinas_view, name="asignar_rutinas"),
     path("gestion-usuarios/", views.gestion_usuarios, name="gestion_usuarios"),
+    path("gestion-usuarios/editar/<int:user_id>/", views.editar_usuario_view, name="editar_usuario"),
+
+    
 ]
+

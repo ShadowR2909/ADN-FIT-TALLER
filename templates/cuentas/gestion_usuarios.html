@@ -7,12 +7,31 @@
 <div class="container mt-4">
     <div class="row mb-4">
         <div class="col-12">
-            <h1 class="text-white">Gestión de Usuarios</h1>
+            <h2 class="text-white">Gestión de Usuarios</h2>
             <p class="lead text-white-50">Administra todos los usuarios del sistema (Socios, Entrenadores y Administradores).</p>
         </div>
     </div>
 
-    <div class="card p-4 bg-dark text-white shadow">
+    <!-- Pestañas de navegación -->
+    <ul class="nav nav-tabs mb-4" id="gestionTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="usuarios-tab" data-bs-toggle="tab" data-bs-target="#usuarios" type="button" role="tab" aria-controls="usuarios" aria-selected="true">
+                <i class="fas fa-users me-2"></i>Ver Usuarios
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="crear-tab" data-bs-toggle="tab" data-bs-target="#crear" type="button" role="tab" aria-controls="crear" aria-selected="false">
+                <i class="fas fa-user-plus me-2"></i>Crear Nuevo Usuario
+            </button>
+        </li>
+    </ul>
+
+    <!-- Contenido de las pestañas -->
+    <div class="tab-content" id="gestionTabContent">
+        
+        <!-- Pestaña: Ver Usuarios -->
+        <div class="tab-pane fade show active" id="usuarios" role="tabpanel" aria-labelledby="usuarios-tab">
+            <div class="card p-4 bg-dark text-white shadow">
         <div class="table-responsive">
             <table class="table table-dark table-striped table-hover">
                 <thead>
@@ -42,10 +61,11 @@
                             {% endif %}
                         </td>
                         <td>
-                            <a href="#" class="btn btn-sm btn-info" disabled>Editar</a>
-                            <form method="POST" action="#" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que quieres eliminar a {{ usuario.username }}?');">
+                            <a href="{% url 'editar_usuario' usuario.id %}" class="btn-editar">Editar</a>
+                            <form method="POST" action="" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que quieres eliminar a {{ usuario.username }}?');">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-sm btn-danger" disabled>Eliminar</button>
+                            <input type="hidden" name="eliminar_usuario_id" value="{{ usuario.id }}">
+                            <button type="submit" class="btn-eliminar">Eliminar</button>
                             </form>
                         </td>
                     </tr>
@@ -58,6 +78,106 @@
             </table>
         </div>
         <a href="{% url 'dashboard' %}" class="btn btn-secondary mt-3 align-self-start">← Volver al Dashboard</a>
+            </div>
+        </div>
+
+        <!-- Pestaña: Crear Nuevo Usuario -->
+        <div class="tab-pane fade" id="crear" role="tabpanel" aria-labelledby="crear-tab">
+            <div class="card p-4 bg-dark text-white shadow">
+                <h4 class="text-success mb-4"><i class="fas fa-user-plus me-2"></i>Crear Nuevo Usuario</h4>
+                
+                <form method="POST" action="{% url 'gestion_usuarios' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="crear_usuario" value="1">
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="username" class="form-label">Nombre de Usuario *</label>
+                            <input type="text" class="form-control bg-secondary text-white border-secondary" 
+                                   id="username" name="username" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="email" class="form-label">Correo Electrónico *</label>
+                            <input type="email" class="form-control bg-secondary text-white border-secondary" 
+                                   id="email" name="email" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="first_name" class="form-label">Nombre</label>
+                            <input type="text" class="form-control bg-secondary text-white border-secondary" 
+                                   id="first_name" name="first_name">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="last_name" class="form-label">Apellido</label>
+                            <input type="text" class="form-control bg-secondary text-white border-secondary" 
+                                   id="last_name" name="last_name">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="password1" class="form-label">Contraseña *</label>
+                            <input type="password" class="form-control bg-secondary text-white border-secondary" 
+                                   id="password1" name="password1" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="password2" class="form-label">Confirmar Contraseña *</label>
+                            <input type="password" class="form-control bg-secondary text-white border-secondary" 
+                                   id="password2" name="password2" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="rol" class="form-label">Rol del Usuario *</label>
+                            <select class="form-select bg-secondary text-white border-secondary" id="rol" name="rol" required>
+                                <option value="">Seleccionar rol...</option>
+                                <option value="Socio">Socio</option>
+                                <option value="Entrenador">Entrenador</option>
+                                <option value="Administrador">Administrador</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="telefono" class="form-label">Teléfono</label>
+                            <input type="text" class="form-control bg-secondary text-white border-secondary" 
+                                   id="telefono" name="telefono" placeholder="Ej: +56912345678">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="is_active" name="is_active" checked>
+                            <label class="form-check-label" for="is_active">
+                                Usuario activo
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <hr class="text-secondary">
+                    
+                    <div class="d-flex justify-content-between">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save me-2"></i>Crear Usuario
+                        </button>
+                        <button type="reset" class="btn btn-outline-secondary">
+                            <i class="fas fa-eraser me-2"></i>Limpiar Formulario
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="mt-4 p-3 bg-info bg-opacity-10 border border-info rounded">
+                    <h6 class="text-info"><i class="fas fa-info-circle me-2"></i>Información Importante</h6>
+                    <ul class="text-light small mb-0">
+                        <li>Los campos marcados con (*) son obligatorios</li>
+                        <li>La contraseña debe tener al menos 8 caracteres</li>
+                        <li>El nombre de usuario debe ser único en el sistema</li>
+                        <li>Los usuarios creados podrán acceder inmediatamente</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
 
 </div>

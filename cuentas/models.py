@@ -5,6 +5,8 @@ from django.dispatch import receiver
 
 # --- Modelo de Perfil (Único Modelo en esta App) ---
 
+
+
 class Profile(models.Model):
     ROLES = [
         ('Administrador', 'Administrador'),
@@ -42,3 +44,6 @@ def create_user_profile(sender, instance, created, **kwargs):
 def save_user_profile(sender, instance, **kwargs):
     """Guarda el objeto Profile cuando se guarda el User."""
     instance.profile.save()
+
+
+    

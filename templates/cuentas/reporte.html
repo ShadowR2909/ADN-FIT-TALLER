@@ -5,7 +5,8 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h1 class="text-info mb-4">📊 Generador de Reportes</h1>
+    {% block content %}
+    <h2 class="text-info mb-4">📊 Generador de Reportes</h2>
     
     <p class="lead text-white-50">Bienvenido, {{ user.get_username|capfirst }}. Como administrador, puedes generar informes clave del gimnasio.</p>
 
@@ -47,7 +48,7 @@
     <hr class="mt-5 mb-4 border-secondary">
     
     <div class="mt-4">
-        <h2 class="text-white">Vista Previa</h2>
+        <h3 class="text-white">Vista Previa</h3>
         <div class="alert alert-secondary text-dark" role="alert">
             Los resultados del reporte aparecerán aquí después de que la lógica del backend sea implementada.
         </div>

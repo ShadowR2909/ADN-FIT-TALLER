@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Gestión de Socios{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    {# Encabezado y botón principal: usa flexbox para alinear el título y el botón #}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Listado de Socios (Clientes)</h1>
+        {# Botón de acción principal: enlaza a la creación de una membresía para un *nuevo* socio #}
+        <a href="{% url 'gestion:membresia_create' %}" class="btn btn-adn-edit btn-lg">
+            <i class="fas fa-plus-circle me-1"></i> Asignar Membresía a Nuevo Socio
+        </a>
+    </div>
+
+    {# Contenedor responsivo para la tabla en dispositivos pequeños #}
+    <div class="table-responsive">
+        {# Tabla con estilos de Bootstrap (franjas, hover y cabecera oscura) #}
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Socio (Username)</th>
+                    <th>Nombre Completo</th>
+                    <th>Estado Membresía</th>
+                    <th>Plan Actual</th>
+                    {# Muestra la cantidad de clases restantes, relevante para planes con límite de clases #}
+                    <th>Clases Restantes</th>
+                    <th class="text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {# Bucle que itera sobre la lista de objetos 'socios_data', cada uno con info del socio y su membresía #}
+                {% for data in socios_data %}
+                <tr>
+                    {# Muestra el nombre de usuario #}
+                    <td>{{ data.socio.username }}</td>
+                    {# Muestra el nombre y apellido, asumiendo que 'socio' es un objeto User #}
+                    <td>{{ data.socio.first_name }} {{ data.socio.last_name }}</td>
+                    
+                    {# Columna de Estado: Muestra un badge de color según si la membresía está activa #}
+                    <td>
+                        {% if data.membresia and data.membresia.activa %}
+                            <span class="badge bg-success">Activa</span>
+                        {% else %}
+                            <span class="badge bg-danger">Inactiva/Sin Plan</span>
+                        {% endif %}
+                    </td>
+                    
+                    {# Columna de Plan y Clases #}
+                    <td>{{ data.membresia.plan.nombre|default:"N/A" }}</td>
+                    <td>
+                        {% if data.membresia and data.membresia.activa %}
+                            {# Si la membresía está activa, muestra las clases restantes en negrita #}
+                            <strong>{{ data.membresia.clases_restantes }}</strong>
+                        {% else %}
+                            {# Si no está activa, muestra 0 #}
+                            0
+                        {% endif %}
+                    </td>
+                    
+                    {# Columna de Acciones #}
+                    <td class="text-center">
+                        {# Botón de Renovar: Enlaza a la creación de membresía, pre-seleccionando al socio actual (data.socio.pk) #}
+                        <a href="{% url 'gestion:membresia_create_for_socio' data.socio.pk %}" class="btn btn-sm btn-info me-2">
+                            <i class="fas fa-sync-alt"></i> Renovar/Asignar
+                        </a>
+                        {# Botón de Ver Detalle: Actualmente es un placeholder ('#') para ver el perfil completo del socio #}
+                        <a href="#" class="btn btn-sm btn-secondary" title="Ver perfil detallado">
+                            <i class="fas fa-eye"></i> Ver Detalle
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                {# Mensaje si la lista de socios está vacía #}
+                <tr>
+                    <td colspan="6" class="text-center">No hay socios registrados en el sistema.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock content %}
