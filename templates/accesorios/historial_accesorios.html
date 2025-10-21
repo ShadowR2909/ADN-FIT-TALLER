@@ -30,148 +30,208 @@
     </div>
 {% endif %}
 
-<!-- Tabs para diferentes tipos de historial -->
+<!-- Tabs -->
 <ul class="nav nav-tabs mb-3" id="historialTabs" role="tablist">
     <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="acciones-tab" data-bs-toggle="tab" data-bs-target="#acciones" type="button" role="tab">
+        <button class="nav-link {% if not request.GET.tab or request.GET.tab != 'reportes' %}active{% endif %}" 
+                id="acciones-tab" data-bs-toggle="tab" data-bs-target="#acciones" type="button" role="tab">
             <i class="fas fa-cogs me-1"></i>Gestión de Accesorios
         </button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" id="reportes-tab" data-bs-toggle="tab" data-bs-target="#reportes" type="button" role="tab">
+        <button class="nav-link {% if request.GET.tab == 'reportes' %}active{% endif %}" 
+                id="reportes-tab" data-bs-toggle="tab" data-bs-target="#reportes" type="button" role="tab">
             <i class="fas fa-exclamation-triangle me-1"></i>Reportes de Faltantes
         </button>
     </li>
 </ul>
 
 <div class="tab-content" id="historialTabsContent">
-    <!-- Tab: Gestión de Accesorios (CRUD) -->
-    <div class="tab-pane fade show active" id="acciones" role="tabpanel">
+
+    <!-- Gestión de Accesorios -->
+    <div class="tab-pane fade {% if not request.GET.tab or request.GET.tab != 'reportes' %}show active{% endif %}" id="acciones" role="tabpanel">
         <div class="table-responsive">
             <table class="table table-hover align-middle">
                 <thead>
                     <tr>
-                        <th scope="col">Accesorio</th>
-                        <th scope="col">Acción</th>
-                        <th scope="col">Usuario</th>
-                        <th scope="col">Fecha</th>
-                        <th scope="col">Detalles</th>
+                        <th>Accesorio</th>
+                        <th>Acción</th>
+                        <th>Usuario</th>
+                        <th>Fecha</th>
+                        <th>Detalles</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for accion in historial_acciones %}
                     <tr class="{% if accion.accion == 'CREADO' %}table-success{% elif accion.accion == 'EDITADO' %}table-info{% elif accion.accion == 'ELIMINADO' %}table-danger{% elif accion.accion == 'REACTIVADO' %}table-warning{% endif %}">
-                        <td class="fw-bold">{{ accion.accesorio_nombre }}</td>
+                        <td>{{ accion.accesorio_nombre }}</td>
                         <td>
                             {% if accion.accion == 'CREADO' %}
-                                <span class="badge bg-success">
-                                    <i class="fas fa-plus-circle me-1"></i>{{ accion.get_accion_display }}
-                                </span>
+                                <span class="badge bg-success"><i class="fas fa-plus-circle me-1"></i>{{ accion.get_accion_display }}</span>
                             {% elif accion.accion == 'EDITADO' %}
-                                <span class="badge bg-info">
-                                    <i class="fas fa-edit me-1"></i>{{ accion.get_accion_display }}
-                                </span>
+                                <span class="badge bg-info"><i class="fas fa-edit me-1"></i>{{ accion.get_accion_display }}</span>
                             {% elif accion.accion == 'ELIMINADO' %}
-                                <span class="badge bg-danger">
-                                    <i class="fas fa-trash me-1"></i>{{ accion.get_accion_display }}
-                                </span>
+                                <span class="badge bg-danger"><i class="fas fa-trash me-1"></i>{{ accion.get_accion_display }}</span>
                             {% elif accion.accion == 'REACTIVADO' %}
-                                <span class="badge bg-warning">
-                                    <i class="fas fa-arrow-repeat me-1"></i>{{ accion.get_accion_display }}
-                                </span>
+                                <span class="badge bg-warning"><i class="fas fa-arrow-repeat me-1"></i>{{ accion.get_accion_display }}</span>
                             {% endif %}
                         </td>
-                        <td>
-                            {% if accion.usuario %}
-                                <span class="badge bg-secondary">{{ accion.usuario.username }}</span>
-                            {% else %}
-                                <span class="text-muted">Usuario eliminado</span>
-                            {% endif %}
-                        </td>
+                        <td>{% if accion.usuario %}{{ accion.usuario.username }}{% else %}Usuario eliminado{% endif %}</td>
                         <td>{{ accion.fecha|localtime|date:"d M Y H:i" }}</td>
-                        <td>
-                            <small class="text-muted">{{ accion.detalles|default:"Sin detalles adicionales" }}</small>
-                        </td>
+                        <td>{{ accion.detalles|default:"Sin detalles adicionales" }}</td>
                     </tr>
                     {% empty %}
-                    <tr>
-                        <td colspan="5" class="text-center text-muted py-4">
-                            No hay acciones registradas todavía.
-                        </td>
-                    </tr>
+                    <tr><td colspan="5" class="text-center text-muted">No hay acciones registradas.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
+
+        <!-- Paginación Acciones -->
+        <nav class="mt-3">
+            <ul class="pagination justify-content-center">
+                {% if historial_acciones.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?tab=acciones&page_acciones=1&page_reportes={{ reportes.number }}">« Primera</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?tab=acciones&page_acciones={{ historial_acciones.previous_page_number }}&page_reportes={{ reportes.number }}">‹ Anterior</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">« Primera</span></li>
+                    <li class="page-item disabled"><span class="page-link">‹ Anterior</span></li>
+                {% endif %}
+                <li class="page-item disabled">
+                    <span class="page-link">Página {{ historial_acciones.number }} de {{ historial_acciones.paginator.num_pages }}</span>
+                </li>
+                {% if historial_acciones.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?tab=acciones&page_acciones={{ historial_acciones.next_page_number }}&page_reportes={{ reportes.number }}">Siguiente ›</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?tab=acciones&page_acciones={{ historial_acciones.paginator.num_pages }}&page_reportes={{ reportes.number }}">Última »</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">Siguiente ›</span></li>
+                    <li class="page-item disabled"><span class="page-link">Última »</span></li>
+                {% endif %}
+            </ul>
+        </nav>
     </div>
 
-    <!-- Tab: Reportes de Faltantes -->
-    <div class="tab-pane fade" id="reportes" role="tabpanel">
+    <!-- Reportes de Faltantes -->
+    <div class="tab-pane fade {% if request.GET.tab == 'reportes' %}show active{% endif %}" id="reportes" role="tabpanel">
         <div class="table-responsive">
             <table class="table table-hover align-middle">
                 <thead>
                     <tr>
-                        <th scope="col">Accesorio</th>
-                        <th scope="col">Cantidad Faltante</th>
-                        <th scope="col">Estado</th>
-                        <th scope="col">Reportado Por</th>
-                        <th scope="col">Confirmado Por</th>
-                        <th scope="col">Fecha Reporte</th>
-                        <th scope="col">Fecha Confirmación</th>
+                        <th>Accesorio</th>
+                        <th>Cantidad Faltante</th>
+                        <th>Estado</th>
+                        <th>Reportado Por</th>
+                        <th>Confirmado Por</th>
+                        <th>Fecha Reporte</th>
+                        <th>Fecha Confirmación</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for reporte in reportes %}
-                    <tr class="{% if reporte.estado == 'PENDIENTE' %}table-warning{% elif reporte.estado == 'DESCARTADO' %}table-secondary{% elif reporte.estado == 'CONFIRMADO' %}table-success{% else %}table-info{% endif %}">
-                        <td class="fw-bold">{{ reporte.accesorio.nombre }}</td>
-                        <td>
-                            <span class="badge bg-warning text-dark">{{ reporte.cantidad_faltante }} unidades</span>
-                        </td>
-                        <td>
-                            {% if reporte.estado == 'PENDIENTE' %}
-                                <span class="badge bg-warning">{{ reporte.get_estado_display }}</span>
-                            {% elif reporte.estado == 'CONFIRMADO' %}
-                                <span class="badge bg-success">{{ reporte.get_estado_display }}</span>
-                            {% elif reporte.estado == 'DESCARTADO' %}
-                                <span class="badge bg-secondary">{{ reporte.get_estado_display }}</span>
-                            {% else %}
-                                <span class="badge bg-info">{{ reporte.get_estado_display }}</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if reporte.empleado_reporte %}
-                                <span class="badge bg-primary">{{ reporte.empleado_reporte.username }}</span>
-                            {% else %}
-                                <span class="text-muted">Usuario eliminado</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if reporte.empleado_confirmacion %}
-                                <span class="badge bg-secondary">{{ reporte.empleado_confirmacion.username }}</span>
-                            {% else %}
-                                <span class="text-muted">-</span>
-                            {% endif %}
-                        </td>
-                        <td>{{ reporte.fecha_reporte|localtime|date:"d M Y H:i" }}</td>
-                        <td>
-                            {% if reporte.fecha_confirmacion %}
-                                {{ reporte.fecha_confirmacion|localtime|date:"d M Y H:i" }}
-                            {% else %}
-                                <span class="text-muted">-</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="7" class="text-center text-muted py-4">
-                            No hay reportes registrados todavía.
-                        </td>
-                    </tr>
-                    {% endfor %}
+                            <tr class="{% if reporte.estado == 'PENDIENTE' %}table-warning{% elif reporte.estado == 'DESCARTADO' %}table-secondary{% elif reporte.estado == 'CONFIRMADO' %}table-success{% else %}table-info{% endif %}">
+                                <td>{{ reporte.accesorio.nombre }}</td>
+                                <td>{{ reporte.cantidad_faltante }}</td>
+                                <td>
+                                    {% if reporte.estado == 'DESCARTADO' %}
+                                        Descartado
+                                    {% else %}
+                                        {{ reporte.get_estado_display }}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if reporte.empleado_reporte %}
+                                        {{ reporte.empleado_reporte.username }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if reporte.empleado_confirmacion %}
+                                        {{ reporte.empleado_confirmacion.username }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>{{ reporte.fecha_reporte|localtime|date:"d M Y H:i" }}</td>
+                                <td>
+                                    {% if reporte.fecha_confirmacion %}
+                                        {{ reporte.fecha_confirmacion|localtime|date:"d M Y H:i" }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+
+
                 </tbody>
             </table>
         </div>
+
+        <!-- Paginación Reportes -->
+        <nav class="mt-3">
+            <ul class="pagination justify-content-center">
+                {% if reportes.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?tab=reportes&page_reportes=1&page_acciones={{ historial_acciones.number }}">« Primera</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?tab=reportes&page_reportes={{ reportes.previous_page_number }}&page_acciones={{ historial_acciones.number }}">‹ Anterior</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">« Primera</span></li>
+                    <li class="page-item disabled"><span class="page-link">‹ Anterior</span></li>
+                {% endif %}
+                <li class="page-item disabled">
+                    <span class="page-link">Página {{ reportes.number }} de {{ reportes.paginator.num_pages }}</span>
+                </li>
+                {% if reportes.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?tab=reportes&page_reportes={{ reportes.next_page_number }}&page_acciones={{ historial_acciones.number }}">Siguiente ›</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?tab=reportes&page_reportes={{ reportes.paginator.num_pages }}&page_acciones={{ historial_acciones.number }}">Última »</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">Siguiente ›</span></li>
+                    <li class="page-item disabled"><span class="page-link">Última »</span></li>
+                {% endif %}
+            </ul>
+        </nav>
     </div>
 </div>
 
 {% endblock content %}
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Obtener la pestaña activa desde el query param ?tab=
+    const urlParams = new URLSearchParams(window.location.search);
+    const activeTab = urlParams.get('tab');
+
+    if (activeTab) {
+        // Seleccionamos los botones y paneles
+        const tabBoton = document.getElementById(activeTab + '-tab');
+        const tabPanel = document.getElementById(activeTab);
+
+        // Removemos 'active' y 'show' de todos
+        document.querySelectorAll('.tab-pane').forEach(tab => tab.classList.remove('show', 'active'));
+        document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
+
+        // Activamos el tab y panel correcto
+        if (tabBoton && tabPanel) {
+            tabBoton.classList.add('active');
+            tabPanel.classList.add('show', 'active');
+        }
+    }
+});
+</script>

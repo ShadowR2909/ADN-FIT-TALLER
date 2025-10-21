@@ -86,3 +86,6 @@ class Reposicion(models.Model):
 
     def __str__(self):
         return f'Reposición de {self.cantidad_comprada} de {self.reporte.accesorio.nombre}'
+
+
+

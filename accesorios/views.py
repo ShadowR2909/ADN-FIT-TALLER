@@ -5,6 +5,7 @@ from .models import Accesorio, ReporteFaltante, Reposicion, HistorialAccesorio
 from .forms import ReporteFaltanteForm, ReposicionForm, AccesorioForm
 from django.utils import timezone
 from django.contrib.auth.mixins import UserPassesTestMixin
+from django.core.paginator import Paginator
 
 
 # ------------------------------
@@ -12,15 +13,28 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 # ------------------------------
 @login_required
 def historial_accesorios(request):
-    reportes = ReporteFaltante.objects.all().select_related('accesorio', 'empleado_reporte', 'empleado_confirmacion')
-    historial_acciones = HistorialAccesorio.objects.all().select_related('usuario')
-    
+    # Historial de acciones
+    historial_acciones_list = HistorialAccesorio.objects.all().select_related('usuario').order_by('-id')
+    page_acciones = request.GET.get('page_acciones', 1)
+    paginator_acciones = Paginator(historial_acciones_list, 10)
+    historial_acciones = paginator_acciones.get_page(page_acciones)
+
+    # Historial de reportes
+    reportes_list = ReporteFaltante.objects.all().select_related('accesorio', 'empleado_reporte', 'empleado_confirmacion').order_by('-id')
+    page_reportes = request.GET.get('page_reportes', 1)
+    paginator_reportes = Paginator(reportes_list, 10)
+    reportes = paginator_reportes.get_page(page_reportes)
+
     context = {
-        'reportes': reportes,
         'historial_acciones': historial_acciones,
+        'reportes': reportes,
         'page_title': 'Historial de Accesorios',
     }
+
     return render(request, 'accesorios/historial_accesorios.html', context)
+
+
+
 
 # ------------------------------
 # INVENTARIO
