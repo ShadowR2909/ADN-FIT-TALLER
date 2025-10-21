@@ -1,0 +1,57 @@
+{% extends 'base.html' %} 
+{% load static %}
+
+{% block content %}
+<div class="dashboard-container">
+    <h2>Listado de Proveedores</h2>
+    <p><a href="{% url 'proveedores:proveedor_create' %}" class="dashboard-link">➕ Agregar Nuevo Proveedor</a></p>
+
+    {# Filtros de Estado #}
+    <div style="margin-bottom: 20px; text-align: center;">
+        <p style="margin-bottom: 5px; color: #cccccc;">Filtrar por estado:</p>
+        <a href="{% url 'proveedores:proveedor_list' %}" class="dashboard-link" style="margin-right: 15px;">Activos</a>
+        <a href="{% url 'proveedores:proveedor_list' %}?estado=inactivo" class="dashboard-link" style="margin-right: 15px;">Inactivos</a>
+        <a href="{% url 'proveedores:proveedor_list' %}?estado=todos" class="dashboard-link">Todos</a>
+    </div>
+
+    {% if proveedores %}
+    <table style="width: 100%; border-collapse: collapse; margin-top: 20px; text-align: left; font-size: 0.95em;">
+        <thead>
+            <tr style="background-color: #30e333; color: #000;">
+                <th style="padding: 10px; border: 1px solid #1a1a1a;">Nombre</th>
+                <th style="padding: 10px; border: 1px solid #1a1a1a;">Teléfono</th>
+                <th style="padding: 10px; border: 1px solid #1a1a1a;">Estado</th>
+                <th style="padding: 10px; border: 1px solid #1a1a1a;">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for proveedor in proveedores %}
+            <tr style="background-color: #2a2a2a; color: #f0f0f0;">
+                <td style="padding: 10px; border: 1px solid #555;">{{ proveedor.nombre }}</td>
+                <td style="padding: 10px; border: 1px solid #555;">{{ proveedor.telefono|default:"N/A" }}</td>
+                <td style="padding: 10px; border: 1px solid #555;">
+                    {% if proveedor.activo %}
+                        <span style="color: #30e333; font-weight: bold;">Activo</span>
+                    {% else %}
+                        <span style="color: #ff6347; font-weight: bold;">Inactivo</span>
+                    {% endif %}
+                </td>
+                <td style="padding: 10px; border: 1px solid #555;">
+                    <a href="{% url 'proveedores:proveedor_detail' proveedor.pk %}" class="dashboard-link">Ver</a> |
+                    <a href="{% url 'proveedores:proveedor_update' proveedor.pk %}" class="dashboard-link">Editar</a> |
+                    <a href="{% url 'proveedores:proveedor_toggle_status' proveedor.pk %}" 
+                       class="dashboard-link" 
+                       style="color: {% if proveedor.activo %} #ff6347; {% else %} #30e333; {% endif %}">
+                        {% if proveedor.activo %} Desactivar {% else %} Activar {% endif %}
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="text-align: center; margin-top: 20px;">No hay proveedores registrados con este filtro.</p>
+    {% endif %}
+
+</div>
+{% endblock content %}

@@ -50,7 +50,9 @@ INSTALLED_APPS = [
     'cuentas.apps.CuentasConfig',   
     'gestion',                      
     'turnos',                       
-    'accesorios',                   
+    'accesorios',  
+    'proveedores',
+                     
 ]
 
 # Configuración de URLs de autenticación
@@ -128,7 +130,7 @@ DATABASES = {
 #        'USER': 'root',      
 #        'PASSWORD': 'root',  
 #        'HOST': 'localhost',  
-#        'PORT': '3306',           
+#        'PORT': '3306',            
 #    }
 #}
 

@@ -10,5 +10,6 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')), 
     path('turnos/', include('turnos.urls')), #vistas de turnos
     path('accesorios/', include('accesorios.urls')), #vistas de accesorios
+    path('proveedores/', include('proveedores.urls')), #vistas de proveedores
     
 ]
