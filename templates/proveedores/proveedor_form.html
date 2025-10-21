@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="dashboard-container">
+    {# Determina si es una creación o una edición #}
+    {% if form.instance.pk %}
+        <h2>Editar Proveedor</h2>
+    {% else %}
+        <h2>Crear Nuevo Proveedor</h2>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        
+        {# Itera sobre los campos del formulario #}
+        {# Nota: Esto incluye 'activo' en el formulario de edición, lo cual está bien #}
+        {% for field in form %}
+        <div class="form-field">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }} 
+            {# Mostrar errores específicos del campo #}
+            {% if field.errors %}
+                <ul class="messages">
+                    {% for error in field.errors %}
+                        <li class="error">{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        {% endfor %}
+        
+        {# Mostrar errores no relacionados con campos específicos #}
+        {% if form.non_field_errors %}
+            <ul class="messages">
+                {% for error in form.non_field_errors %}
+                    <li class="error">{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        <button type="submit" class="form-submit-btn">Guardar Proveedor</button>
+    </form>
+
+    <p style="margin-top: 20px;">
+        <a href="{% url 'proveedores:proveedor_list' %}" class="dashboard-link">← Volver al Listado</a>
+    </p>
+</div>
+{% endblock content %}

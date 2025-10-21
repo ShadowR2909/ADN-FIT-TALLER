@@ -50,7 +50,9 @@ INSTALLED_APPS = [
     'cuentas.apps.CuentasConfig',   
     'gestion',                      
     'turnos',                       
-    'accesorios',                   
+    'accesorios',  
+    'proveedores',
+                     
 ]
 
 # Configuración de URLs de autenticación
@@ -120,6 +122,19 @@ DATABASES = {
         'PORT': '6543',
     }
 }
+
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.mysql',
+#        'NAME': 'gimnasio',  
+#        'USER': 'root',      
+#        'PASSWORD': 'root',  
+#        'HOST': 'localhost',  
+#        'PORT': '3306',            
+#    }
+#}
+
+
 
 
 # Password validation

@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="dashboard-container">
+    <h2>Detalle del Proveedor</h2>
+    
+    <div class="profile-info" style="text-align: left; padding: 20px;">
+        <h3 style="color: #30e333; font-size: 1.8em; margin-bottom: 20px; border-bottom: 1px solid #333;">{{ proveedor.nombre }}</h3>
+
+        <p style="margin-bottom: 15px;">
+            <strong>Estado:</strong> 
+            {% if proveedor.activo %}
+                <span style="color: #30e333; font-weight: bold;">ACTIVO</span>
+            {% else %}
+                <span style="color: #ff6347; font-weight: bold;">INACTIVO</span>
+            {% endif %}
+        </p>
+
+        <p><strong>Teléfono:</strong> {{ proveedor.telefono|default:"N/A" }}</p>
+        <p><strong>Dirección:</strong> {{ proveedor.direccion|default:"N/A" }}</p>
+    </div>
+
+    <p style="margin-top: 30px;">
+        <a href="{% url 'proveedores:proveedor_update' proveedor.pk %}" class="dashboard-link">✎ Editar Datos</a> 
+        | 
+        <a href="{% url 'proveedores:proveedor_toggle_status' proveedor.pk %}" 
+           class="dashboard-link" 
+           style="color: {% if proveedor.activo %} #ff6347; {% else %} #30e333; {% endif %}">
+            {% if proveedor.activo %} 🚷 Desactivar Proveedor {% else %} ✔️ Activar Proveedor {% endif %}
+        </a>
+    </p>
+
+    <p style="margin-top: 15px;">
+        <a href="{% url 'proveedores:proveedor_list' %}" class="dashboard-link">← Volver al Listado</a>
+    </p>
+</div>
+{% endblock content %}
