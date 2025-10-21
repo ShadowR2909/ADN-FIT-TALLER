@@ -41,7 +41,7 @@
                     <a href="{% url 'proveedores:proveedor_update' proveedor.pk %}" class="dashboard-link">Editar</a> |
                     <a href="{% url 'proveedores:proveedor_toggle_status' proveedor.pk %}" 
                        class="dashboard-link" 
-                       style="color: {% if proveedor.activo %} #ff6347; {% else %} #30e333; {% endif %}">
+                    >   
                         {% if proveedor.activo %} Desactivar {% else %} Activar {% endif %}
                     </a>
                 </td>

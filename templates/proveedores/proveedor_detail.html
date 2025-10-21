@@ -26,7 +26,6 @@
         | 
         <a href="{% url 'proveedores:proveedor_toggle_status' proveedor.pk %}" 
            class="dashboard-link" 
-           style="color: {% if proveedor.activo %} #ff6347; {% else %} #30e333; {% endif %}">
             {% if proveedor.activo %} 🚷 Desactivar Proveedor {% else %} ✔️ Activar Proveedor {% endif %}
         </a>
     </p>
