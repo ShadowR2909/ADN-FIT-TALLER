@@ -107,7 +107,7 @@ WSGI_APPLICATION = 'gimnasio.wsgi.application'
 
 
 # ------------------------------------------------------------------
-# Database (PostgreSQL/Supabase)
+# Database (PostgreSQL/Supabase) (mysql comentado)
 # ------------------------------------------------------------------
 
 DATABASES = {
@@ -120,6 +120,19 @@ DATABASES = {
         'PORT': '6543',
     }
 }
+
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.mysql',
+#        'NAME': 'gimnasio',  
+#        'USER': 'root',      
+#        'PASSWORD': 'root',  
+#        'HOST': 'localhost',  
+#        'PORT': '3306',            
+#    }
+#}
+
+
 
 
 # Password validation
