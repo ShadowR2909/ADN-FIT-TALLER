@@ -20,6 +20,7 @@
             <tr style="background-color: #30e333; color: #000;">
                 <th style="padding: 10px; border: 1px solid #1a1a1a;">Nombre</th>
                 <th style="padding: 10px; border: 1px solid #1a1a1a;">Teléfono</th>
+                <th style="padding: 10px; border: 1px solid #1a1a1a;">Correo electrónico</th>
                 <th style="padding: 10px; border: 1px solid #1a1a1a;">Estado</th>
                 <th style="padding: 10px; border: 1px solid #1a1a1a;">Acciones</th>
             </tr>
@@ -29,6 +30,7 @@
             <tr style="background-color: #2a2a2a; color: #f0f0f0;">
                 <td style="padding: 10px; border: 1px solid #555;">{{ proveedor.nombre }}</td>
                 <td style="padding: 10px; border: 1px solid #555;">{{ proveedor.telefono|default:"N/A" }}</td>
+                <td style="padding: 10px; border: 1px solid #555;">{{ proveedor.email|default:"N/A" }}</td>
                 <td style="padding: 10px; border: 1px solid #555;">
                     {% if proveedor.activo %}
                         <span style="color: #30e333; font-weight: bold;">Activo</span>
@@ -41,7 +43,7 @@
                     <a href="{% url 'proveedores:proveedor_update' proveedor.pk %}" class="dashboard-link">Editar</a> |
                     <a href="{% url 'proveedores:proveedor_toggle_status' proveedor.pk %}" 
                        class="dashboard-link" 
-                       style="color: {% if proveedor.activo %} #ff6347; {% else %} #30e333; {% endif %}">
+                    >   
                         {% if proveedor.activo %} Desactivar {% else %} Activar {% endif %}
                     </a>
                 </td>

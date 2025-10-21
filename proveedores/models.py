@@ -5,7 +5,7 @@ from django.db import models
 class Proveedor(models.Model):
     nombre = models.CharField(max_length=100, unique=True, verbose_name="Nombre del Proveedor")
     telefono = models.CharField(max_length=15, blank=True, null=True, verbose_name="Teléfono")
-    direccion = models.TextField(blank=True, null=True, verbose_name="Dirección")
+    email = models.EmailField(blank=True, null=True, verbose_name="Correo Electrónico")
 
     activo = models.BooleanField(default=True, verbose_name="Estado Activo")
     class Meta:

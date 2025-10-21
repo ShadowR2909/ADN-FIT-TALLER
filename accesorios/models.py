@@ -1,32 +1,37 @@
 from django.db import models
 from django.conf import settings
 from django.core.validators import MinValueValidator
+from proveedores.models import Proveedor  # Import del proveedor
 from django.utils import timezone
 
 User = settings.AUTH_USER_MODEL
 
-# 1. Accesorio primero
 class Accesorio(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
     cantidad_total = models.PositiveIntegerField(default=0, verbose_name="Cantidad en Inventario")
     descripcion = models.TextField(blank=True, null=True)
     
-    # Soft delete
-    activo = models.BooleanField(default=True)  # <--- esto es lo nuevo
-    
-    # Campos de auditoría
+    proveedor = models.ForeignKey(
+        Proveedor,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='accesorios',
+        verbose_name="Proveedor"
+    )
+
+    activo = models.BooleanField(default=True)
     creado_por = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='accesorios_creados')
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     modificado_por = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='accesorios_modificados')
     fecha_modificacion = models.DateTimeField(auto_now=True)
-
 
     class Meta:
         verbose_name_plural = "Accesorios"
         ordering = ['nombre']
 
     def __str__(self):
-        return f"{self.nombre} ({self.cantidad_total} en stock)"
+        return f"{self.nombre} ({self.cantidad_total} en stock) - {self.proveedor.nombre if self.proveedor else 'Sin proveedor'}"
 
 
 class HistorialAccesorio(models.Model):
@@ -57,7 +62,7 @@ class ReporteFaltante(models.Model):
         ('CONFIRMADO', 'Confirmado (Requiere Compra)'),
         ('DESCARTADO', 'Descartado por Empleado/Admin'),
     ]
-    accesorio = models.ForeignKey('Accesorio', on_delete=models.CASCADE)
+    accesorio = models.ForeignKey(Accesorio, on_delete=models.CASCADE)
     cantidad_faltante = models.PositiveIntegerField(validators=[MinValueValidator(1)])
     fecha_reporte = models.DateTimeField(auto_now_add=True)
     empleado_reporte = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='reportes_creados')
@@ -73,8 +78,9 @@ class ReporteFaltante(models.Model):
     def __str__(self):
         return f"Reporte #{self.id} de {self.accesorio.nombre} - {self.estado}"
 
+
 class Reposicion(models.Model):
-    reporte = models.OneToOneField('ReporteFaltante', on_delete=models.CASCADE, related_name='reposicion')
+    reporte = models.OneToOneField(ReporteFaltante, on_delete=models.CASCADE, related_name='reposicion')
     cantidad_comprada = models.PositiveIntegerField(default=0, verbose_name="Cantidad de unidades compradas")
     fecha_compra = models.DateTimeField(auto_now_add=True)
     administrador = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='compras_procesadas')

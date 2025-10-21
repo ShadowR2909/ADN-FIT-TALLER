@@ -26,14 +26,14 @@
 </div>
 
 {% if messages %}
-    <div class="alert-container">
-        {% for message in messages %}
-            <div class="alert alert-adn-{{ message.tags }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        {% endfor %}
+<div class="alert-container">
+    {% for message in messages %}
+    <div class="alert alert-adn-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
+    {% endfor %}
+</div>
 {% endif %}
 
 <div class="table-responsive">
@@ -42,6 +42,7 @@
             <tr>
                 <th scope="col">Accesorio</th>
                 <th scope="col">Descripción</th>
+                <th scope="col">Proveedor</th>
                 <th scope="col" class="text-center">Cantidad Total</th>
                 {% if user.profile.rol == 'Administrador' %}
                 <th scope="col" class="text-center">Acciones</th>
@@ -59,6 +60,7 @@
                         <span class="text-muted">Sin descripción.</span>
                     {% endif %}
                 </td>
+                <td>{{ accesorio.proveedor.nombre }}</td>
                 <td class="text-center">
                     <span class="badge bg-success py-2 px-3 fs-6">{{ accesorio.cantidad_total }}</span>
                 </td>
@@ -72,9 +74,8 @@
                         </a>
                         <a href="{% url 'accesorios:accesorio_delete' accesorio.pk %}" 
                            class="btn btn-sm btn-danger rounded-pill" 
-                           title="Eliminar accesorio" 
-                           onclick="return confirm('¿Desea eliminar este accesorio?');">
-                            <i class="bi bi-trash-fill"></i> Eliminar
+                           title="Eliminar accesorio">
+                            <i class="bi bi-trash-fill"></i> Desactivar
                         </a>
                     </div>
                 </td>
@@ -82,7 +83,7 @@
             </tr>
             {% empty %}
             <tr>
-                <td colspan="{% if user.profile.rol == 'Administrador' %}4{% else %}3{% endif %}" class="text-center text-muted py-4">
+                <td colspan="{% if user.profile.rol == 'Administrador' %}5{% else %}4{% endif %}" class="text-center text-muted py-4">
                     No hay accesorios registrados en el inventario.
                 </td>
             </tr>

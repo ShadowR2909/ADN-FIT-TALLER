@@ -18,14 +18,14 @@
 </p>
 
 {% if messages %}
-    <div class="alert-container">
-        {% for message in messages %}
-            <div class="alert alert-adn-{{ message.tags }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        {% endfor %}
+<div class="alert-container">
+    {% for message in messages %}
+    <div class="alert alert-adn-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
+    {% endfor %}
+</div>
 {% endif %}
 
 <div class="table-responsive">
@@ -70,12 +70,10 @@
                         {% else %}
                             <span class="text-muted fst-italic">Pendiente de confirmación por el Administrador</span>
                         {% endif %}
-
                     {% elif reporte.estado == 'CONFIRMADO' and user.profile.rol == 'Administrador' %}
                         <a href="{% url 'accesorios:reposicion_create' reporte.pk %}" class="btn btn-primary btn-sm">
                             Procesar Compra ({{ reporte.cantidad_faltante }} u.)
                         </a>
-
                     {% else %}
                         <span class="tag-estado {{ reporte.estado|lower }}">{{ reporte.get_estado_display }}</span>
                         {% if reporte.estado == 'CERRADO' %}

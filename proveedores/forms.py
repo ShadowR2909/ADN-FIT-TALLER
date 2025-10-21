@@ -7,11 +7,11 @@ class ProveedorForm(forms.ModelForm):
     class Meta:
         model = Proveedor
         # Solo incluimos los 3 atributos esenciales
-        fields = ['nombre', 'telefono', 'direccion']
+        fields = ['nombre', 'telefono', 'email']
         
         # Opcional: Personalizar widgets (para usar con tu CSS)
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control'}),
             'telefono': forms.TextInput(attrs={'class': 'form-control'}),
-            'direccion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'correo': forms.TextInput(attrs={'class': 'form-control'}),
         }
