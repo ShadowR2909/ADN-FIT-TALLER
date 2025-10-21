@@ -31,7 +31,7 @@
     <form method="post" class="needs-validation" novalidate>
         {% csrf_token %}
 
-        {# Campo Nombre #}
+        {# Nombre #}
         <div class="mb-3">
             <label for="{{ form.nombre.id_for_label }}" class="form-label">
                 <i class="fas fa-tag me-1"></i>{{ form.nombre.label }}
@@ -42,7 +42,7 @@
             {% endfor %}
         </div>
 
-        {# Campo Cantidad Inicial #}
+        {# Cantidad Inicial #}
         <div class="mb-3">
             <label for="{{ form.cantidad_total.id_for_label }}" class="form-label">
                 <i class="fas fa-boxes me-1"></i>{{ form.cantidad_total.label }}
@@ -61,7 +61,18 @@
             {% endfor %}
         </div>
 
-        {# Campo Descripción #}
+        {# Proveedor #}
+        <div class="mb-3">
+            <label for="{{ form.proveedor.id_for_label }}" class="form-label">
+                <i class="fas fa-industry me-1"></i>{{ form.proveedor.label }}
+            </label>
+            {% render_field form.proveedor class+="form-select" %}
+            {% for error in form.proveedor.errors %}
+                <div class="text-danger small mt-1">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        {# Descripción #}
         <div class="mb-4">
             <label for="{{ form.descripcion.id_for_label }}" class="form-label">
                 <i class="fas fa-align-left me-1"></i>{{ form.descripcion.label }}
@@ -94,14 +105,12 @@
     </form>
 </div>
 
-{# Script para validación del formulario #}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.querySelector('.needs-validation');
     const nombreInput = document.getElementById('{{ form.nombre.id_for_label }}');
     const cantidadInput = document.getElementById('{{ form.cantidad_total.id_for_label }}');
-    
-    // Validación en tiempo real
+
     nombreInput.addEventListener('input', function() {
         if (this.value.trim().length < 2) {
             this.setCustomValidity('El nombre debe tener al menos 2 caracteres');
@@ -112,7 +121,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.classList.add('is-valid');
         }
     });
-    
+
     cantidadInput.addEventListener('input', function() {
         if (this.value < 0) {
             this.setCustomValidity('La cantidad no puede ser negativa');
@@ -123,7 +132,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.classList.add('is-valid');
         }
     });
-    
+
     form.addEventListener('submit', function(event) {
         if (!form.checkValidity()) {
             event.preventDefault();

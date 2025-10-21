@@ -1,39 +1,74 @@
 {% extends 'base.html' %}
+{% load static %}
+
 {% block title %}Accesorios Inactivos{% endblock %}
 
 {% block content %}
-<h2>Accesorios Inactivos</h2>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Accesorios Inactivos</h2>
+    {% if messages %}
+    <div class="alert-container mb-3">
+        {% for message in messages %}
+            <div class="alert alert-adn-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <a href="{% url 'accesorios:inventario_list' %}" class="btn btn-secondary">
+        Volver al Inventario
+    </a>
+</div>
+
 <div class="table-responsive">
     <table class="table table-hover align-middle">
         <thead>
             <tr>
-                <th>Accesorio</th>
-                <th>Descripción</th>
-                <th class="text-center">Cantidad Total</th>
-                <th class="text-center">Acciones</th>
+                <th scope="col">Accesorio</th>
+                <th scope="col">Descripción</th>
+                <th scope="col" class="text-center">Cantidad Total</th>
+                {% if user.profile.rol == 'Administrador' %}
+                <th scope="col" class="text-center">Acciones</th>
+                {% endif %}
             </tr>
         </thead>
         <tbody>
             {% for accesorio in accesorios %}
             <tr>
-                <td>{{ accesorio.nombre }}</td>
-                <td>{{ accesorio.descripcion|default:"Sin descripción" }}</td>
-                <td class="text-center">{{ accesorio.cantidad_total }}</td>
-                <td class="text-center">
-                    <a href="{% url 'accesorios:accesorio_reactivar' accesorio.pk %}" 
-                       class="btn btn-sm btn-success rounded-pill"
-                       onclick="return confirm('¿Desea reactivar este accesorio?');">
-                        Reactivar
-                    </a>
+                <td class="fw-bold">{{ accesorio.nombre }}</td>
+                <td>
+                    {% if accesorio.descripcion %}
+                        {{ accesorio.descripcion|truncatechars:70 }}
+                    {% else %}
+                        <span class="text-muted">Sin descripción.</span>
+                    {% endif %}
                 </td>
+                <td class="text-center">
+                    <span class="badge bg-success py-2 px-3 fs-6">{{ accesorio.cantidad_total }}</span>
+                </td>
+                {% if user.profile.rol == 'Administrador' %}
+                <td class="text-center">
+                    <div class="d-flex justify-content-center gap-2">
+                        <a href="{% url 'accesorios:accesorio_reactivar' accesorio.pk %}" 
+                           class="btn btn-sm btn-success rounded-pill" 
+                           title="Reactivar accesorio"
+                           onclick="return confirm('¿Está seguro que desea reactivar este accesorio?');">
+                            <i class="bi bi-arrow-repeat"></i> Reactivar
+                        </a>
+                    </div>
+                </td>
+                {% endif %}
             </tr>
             {% empty %}
             <tr>
-                <td colspan="4" class="text-center text-muted py-4">No hay accesorios inactivos.</td>
+                <td colspan="{% if user.profile.rol == 'Administrador' %}4{% else %}3{% endif %}" class="text-center text-muted py-4">
+                    No hay accesorios inactivos.
+                </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
-<a href="{% url 'accesorios:inventario_list' %}" class="btn btn-secondary mt-3">Volver al Inventario</a>
-{% endblock %}
+
+{% endblock content %}

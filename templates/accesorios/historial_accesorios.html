@@ -55,6 +55,7 @@
                 <thead>
                     <tr>
                         <th>Accesorio</th>
+                        <th>Proveedor</th>
                         <th>Acción</th>
                         <th>Usuario</th>
                         <th>Fecha</th>
@@ -65,6 +66,7 @@
                     {% for accion in historial_acciones %}
                     <tr class="{% if accion.accion == 'CREADO' %}table-success{% elif accion.accion == 'EDITADO' %}table-info{% elif accion.accion == 'ELIMINADO' %}table-danger{% elif accion.accion == 'REACTIVADO' %}table-warning{% endif %}">
                         <td>{{ accion.accesorio_nombre }}</td>
+                        <td>{{ accion.accesorio.proveedor.nombre|default:"-" }}</td>
                         <td>
                             {% if accion.accion == 'CREADO' %}
                                 <span class="badge bg-success"><i class="fas fa-plus-circle me-1"></i>{{ accion.get_accion_display }}</span>
@@ -81,7 +83,7 @@
                         <td>{{ accion.detalles|default:"Sin detalles adicionales" }}</td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="5" class="text-center text-muted">No hay acciones registradas.</td></tr>
+                    <tr><td colspan="6" class="text-center text-muted">No hay acciones registradas.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -126,6 +128,7 @@
                 <thead>
                     <tr>
                         <th>Accesorio</th>
+                        <th>Proveedor</th>
                         <th>Cantidad Faltante</th>
                         <th>Estado</th>
                         <th>Reportado Por</th>
@@ -136,42 +139,41 @@
                 </thead>
                 <tbody>
                     {% for reporte in reportes %}
-                            <tr class="{% if reporte.estado == 'PENDIENTE' %}table-warning{% elif reporte.estado == 'DESCARTADO' %}table-secondary{% elif reporte.estado == 'CONFIRMADO' %}table-success{% else %}table-info{% endif %}">
-                                <td>{{ reporte.accesorio.nombre }}</td>
-                                <td>{{ reporte.cantidad_faltante }}</td>
-                                <td>
-                                    {% if reporte.estado == 'DESCARTADO' %}
-                                        Descartado
-                                    {% else %}
-                                        {{ reporte.get_estado_display }}
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if reporte.empleado_reporte %}
-                                        {{ reporte.empleado_reporte.username }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if reporte.empleado_confirmacion %}
-                                        {{ reporte.empleado_confirmacion.username }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                                <td>{{ reporte.fecha_reporte|localtime|date:"d M Y H:i" }}</td>
-                                <td>
-                                    {% if reporte.fecha_confirmacion %}
-                                        {{ reporte.fecha_confirmacion|localtime|date:"d M Y H:i" }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            {% endfor %}
-
-
+                    <tr class="{% if reporte.estado == 'PENDIENTE' %}table-warning{% elif reporte.estado == 'DESCARTADO' %}table-secondary{% elif reporte.estado == 'CONFIRMADO' %}table-success{% else %}table-info{% endif %}">
+                        <td>{{ reporte.accesorio.nombre }}</td>
+                        <td>{{ reporte.accesorio.proveedor.nombre|default:"-" }}</td>
+                        <td>{{ reporte.cantidad_faltante }}</td>
+                        <td>
+                            {% if reporte.estado == 'DESCARTADO' %}
+                                Descartado
+                            {% else %}
+                                {{ reporte.get_estado_display }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if reporte.empleado_reporte %}
+                                {{ reporte.empleado_reporte.username }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if reporte.empleado_confirmacion %}
+                                {{ reporte.empleado_confirmacion.username }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>{{ reporte.fecha_reporte|localtime|date:"d M Y H:i" }}</td>
+                        <td>
+                            {% if reporte.fecha_confirmacion %}
+                                {{ reporte.fecha_confirmacion|localtime|date:"d M Y H:i" }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
@@ -211,23 +213,18 @@
 
 {% endblock content %}
 
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Obtener la pestaña activa desde el query param ?tab=
     const urlParams = new URLSearchParams(window.location.search);
     const activeTab = urlParams.get('tab');
 
     if (activeTab) {
-        // Seleccionamos los botones y paneles
         const tabBoton = document.getElementById(activeTab + '-tab');
         const tabPanel = document.getElementById(activeTab);
 
-        // Removemos 'active' y 'show' de todos
         document.querySelectorAll('.tab-pane').forEach(tab => tab.classList.remove('show', 'active'));
         document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
 
-        // Activamos el tab y panel correcto
         if (tabBoton && tabPanel) {
             tabBoton.classList.add('active');
             tabPanel.classList.add('show', 'active');
